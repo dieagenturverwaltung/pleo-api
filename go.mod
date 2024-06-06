@@ -1,4 +1,4 @@
-module pleo-api
+module github.com/dieagenturverwaltung/pleo-api
 
 go 1.22
 

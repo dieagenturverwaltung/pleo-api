@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/dieagenturverwaltung/pleo-api/api"
 	"golang.org/x/oauth2"
-	"pleo-api/api"
 )
 
 type tokenSourceWrapper struct {
