@@ -7,7 +7,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func (client *Client) AuthURL(redirectURL, state string) string {
+func (client *Client) AuthURL(redirectURL, state string) (url string, verifier string) {
 	cfg := &oauth2.Config{
 		ClientID:     client.config.ClientID,
 		ClientSecret: client.config.ClientSecret,
@@ -16,13 +16,15 @@ func (client *Client) AuthURL(redirectURL, state string) string {
 		Scopes:       client.config.Scopes,
 	}
 
-	return cfg.AuthCodeURL(state)
+	verifier = oauth2.GenerateVerifier()
+	url = cfg.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))
+	return url, verifier
 }
 
-func (client *Client) AuthRedirectHandler(ctx context.Context, r *http.Request) (*oauth2.Token, string, error) {
+func (client *Client) AuthRedirectHandler(ctx context.Context, verifier string, r *http.Request) (*oauth2.Token, string, error) {
 	code := r.FormValue("code")
 	state := r.FormValue("state")
 
-	exchange, err := client.config.Exchange(ctx, code)
+	exchange, err := client.config.Exchange(ctx, code, oauth2.VerifierOption(verifier))
 	return exchange, state, err
 }
