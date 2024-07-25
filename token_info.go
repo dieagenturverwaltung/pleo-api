@@ -1,12 +1,12 @@
 package pleo_api
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"golang.org/x/oauth2"
 )
@@ -42,20 +42,15 @@ type TokenInfo struct {
 
 func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*TokenInfo, string, error) {
 	introspectUrl := client.config.Endpoint.TokenURL + "/introspect"
-	body := tokenInfoRequest{
-		Token: token.AccessToken,
-	}
+	var form = make(url.Values)
+	form.Set("token", token.AccessToken)
 
-	marshal, err := json.Marshal(body)
+	request, err := http.NewRequest("POST", introspectUrl, strings.NewReader(form.Encode()))
 	if err != nil {
 		return nil, "", err
 	}
 
-	request, err := http.NewRequest("POST", introspectUrl, bytes.NewReader(marshal))
-	if err != nil {
-		return nil, "", err
-	}
-
+	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	request.SetBasicAuth(url.QueryEscape(client.config.ClientID), url.QueryEscape(client.config.ClientSecret))
 	response, err := http.DefaultClient.Do(request.WithContext(ctx))
 	if err != nil {
