@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -39,7 +40,7 @@ type TokenInfo struct {
 	Jti       string `json:"jti"`
 }
 
-func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*TokenInfo, error) {
+func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*TokenInfo, string, error) {
 	introspectUrl := client.config.Endpoint.TokenURL + "/introspect"
 	body := tokenInfoRequest{
 		Token: token.AccessToken,
@@ -47,27 +48,32 @@ func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*Toke
 
 	marshal, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	request, err := http.NewRequest("POST", introspectUrl, bytes.NewReader(marshal))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	request.SetBasicAuth(url.QueryEscape(client.config.ClientID), url.QueryEscape(client.config.ClientSecret))
 	response, err := http.DefaultClient.Do(request.WithContext(ctx))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	defer response.Body.Close()
 
-	var info TokenInfo
-	err = json.NewDecoder(response.Body).Decode(&info)
+	all, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return &info, nil
+	var info TokenInfo
+	err = json.Unmarshal(all, &info)
+	if err != nil {
+		return nil, string(all), err
+	}
+
+	return &info, string(all), nil
 }
