@@ -21,10 +21,18 @@ func (client *Client) AuthURL(redirectURL, state string) (url string, verifier s
 	return url, verifier
 }
 
-func (client *Client) AuthRedirectHandler(ctx context.Context, verifier string, r *http.Request) (*oauth2.Token, string, error) {
+func (client *Client) AuthRedirectHandler(ctx context.Context, redirectURL, verifier string, r *http.Request) (*oauth2.Token, string, error) {
 	code := r.FormValue("code")
 	state := r.FormValue("state")
 
-	exchange, err := client.config.Exchange(ctx, code, oauth2.VerifierOption(verifier))
+	cfg := &oauth2.Config{
+		ClientID:     client.config.ClientID,
+		ClientSecret: client.config.ClientSecret,
+		Endpoint:     client.config.Endpoint,
+		RedirectURL:  redirectURL,
+		Scopes:       client.config.Scopes,
+	}
+
+	exchange, err := cfg.Exchange(ctx, code, oauth2.VerifierOption(verifier))
 	return exchange, state, err
 }
