@@ -1,0 +1,4138 @@
+openapi: 3.0.0
+info:
+  title: Pleo.io API
+  description: Pleo.io API
+  version: 0.0.1
+servers:
+- url: https://openapi.pleo.io/v1/
+  description: Production
+- url: https://openapi.staging.pleo.io/v1/
+  description: Staging
+security:
+- BearerToken: []
+paths:
+  /health:
+    get:
+      tags:
+      - HealthCheck
+      summary: Returns healtcheck status of OpenAPIs for a given company
+      operationId: healthStatus
+      parameters: []
+      responses:
+        "200":
+          description: Health check status is returned in the response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /expenses/{expenseId}:
+    get:
+      tags:
+      - Expenses
+      summary: Get an expense for a company
+      operationId: getExpense
+      parameters:
+      - name: expenseId
+        in: path
+        description: Unique UUID of the expense.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An expense has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /expenses:
+    get:
+      tags:
+      - Expenses
+      summary: Get expenses for a company
+      description: By default does not return expenses with Transaction State AUTHORIZATION
+        or AUTHORIZATION_REVERSAL.
+      operationId: getExpenses
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of expenses to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+      - name: dateFrom
+        in: query
+        description: "Date and time to start the expense search from. Format is: YYYY-MM-DDTHH:mi:ss.SSSZ"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+          example: 2021-02-10T14:00:00Z
+      - name: dateTo
+        in: query
+        description: "Date and time to start the expense search from. Format is: YYYY-MM-DDTHH:mi:ss.SSSZ"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+          example: 2021-02-10T19:00:00Z
+      - name: types
+        in: query
+        description: An array of the expense types to filter on.
+        required: false
+        style: form
+        explode: true
+        schema:
+          uniqueItems: true
+          type: array
+          example: "[\"CARD\", \"MANUAL_TRANSFER\"]"
+          items:
+            type: string
+            nullable: false
+            enum:
+            - CARD
+            - PERSONAL_TRANSFER
+            - BILL_INVOICE
+            - BILL_INVOICE_PAYMENT
+            - LOAD
+            - MANUAL
+            - MANUAL_TRANSFER
+            - PLEO_INVOICE
+            - EMPLOYEE_BANK_TRANSFER
+            - CASHBACK
+            - OVERDRAFT_FEE
+            - OVERDRAFT_INTEREST
+      - name: accountId
+        in: query
+        description: Unique UUID of the expense category account to filter the expenses
+          by.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: tagId
+        in: query
+        description: "Unique UUID of the tag the expense belongs to, to filter the\
+          \ expenses by."
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: transactionStates
+        in: query
+        description: An array of transaction states to filter the expenses by.
+        required: false
+        style: form
+        explode: true
+        schema:
+          uniqueItems: true
+          type: array
+          example: "[\"AUTHORIZATION\", \"PRESENTMENT\"]"
+          items:
+            type: string
+            nullable: false
+            enum:
+            - AUTHORIZATION
+            - AUTHORIZATION_REVERSAL
+            - CHARGE_BACK
+            - CHARGE_BACK_REVERSAL
+            - PRESENTMENT
+            - SECOND_PRESENTMENT
+            - REFUND
+            - LOAD
+            - UNLOAD
+            - FAILED
+            - MANUAL
+      - name: status
+        in: query
+        description: An array of the export status to filter on.
+        required: false
+        style: form
+        explode: true
+        schema:
+          uniqueItems: true
+          type: array
+          example: "[\"NOT_EXPORTED\", \"EXPORTED\"]"
+          items:
+            type: string
+            nullable: false
+            enum:
+            - NOT_EXPORTED
+            - QUEUED
+            - EXPORTING
+            - EXPORTED
+      responses:
+        "200":
+          description: Expenses have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpensesResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Expenses
+      summary: 'Update a given list of expenses. '
+      description: "At the moment, it is only possible to update expenses' status"
+      operationId: updateExpenses
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpensesUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /tag-groups:
+    get:
+      tags:
+      - Tag Groups
+      summary: Get all tag groups belonging to the specified company.
+      description: This endpoint returns all tag groups belonging to the company as
+        well as their attributes
+      operationId: getTagGroups
+      parameters:
+      - name: archived
+        in: query
+        description: This flag allows you fetch only tag groups that have been archived
+          if set to true or those that are still actively in use if set to false.
+          By default it will only fetch active tag groups.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Tag groups have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagGroupsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Tag Groups
+      summary: Create a new tag group.
+      description: This endpoint allows for the creation of a new Tag Group with its
+        attribute values
+      operationId: createTagGroup
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagGroupCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: Tag group has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagGroupResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /tag-groups/{tagGroupId}:
+    get:
+      tags:
+      - Tag Groups
+      summary: Get a tag group
+      description: "This endpoint will return a single Tag Group, as well as all of\
+        \ it's attributes"
+      operationId: getTagGroup
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Tag group has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagGroupResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Tag Groups
+      summary: Delete or archive a tag group.
+      description: This endpoint will delete or archive a Tag Group and all associated
+        attributes and Tags.
+      operationId: deleteTagGroup
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: archive
+        in: query
+        description: This flag allows you to archive the tag group as opposed to a
+          forced delete of the tag group and it's associations.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+    patch:
+      tags:
+      - Tag Groups
+      summary: Update a tag group
+      operationId: updateTagGroup
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTagGroupRequest'
+        required: true
+      responses:
+        "200":
+          description: Tag group has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagGroupResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /tag-groups/{tagGroupId}/tags:
+    get:
+      tags:
+      - Tag Groups
+      summary: Get all tags for a specified tag group
+      operationId: getTags
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: hidden
+        in: query
+        description: This flag allows you fetch only tags that have been hidden/archived
+          if set to true or tags that are still actively in use if set to false. By
+          default it will only fetch active tags.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Tags have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Tag Groups
+      summary: Create a new tag
+      description: This endpoint allows for the creation of a new Tag and its attribute
+        values.
+      operationId: createTag
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: Tag group has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /tag-groups/{tagGroupId}/tags/{tagId}:
+    get:
+      tags:
+      - Tag Groups
+      summary: Get a tag from a tag group
+      description: This endpoint returns a specific tag with it's attribute values
+        for a specified tag group
+      operationId: getTag
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: tagId
+        in: path
+        description: Unique UUID of the tag.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Tag has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Tag Groups
+      summary: Delete a tag
+      description: ". If this tag is not already in use, the tag will be deleted,\
+        \ otherwise an error will be returned."
+      operationId: deleteTag
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: tagId
+        in: path
+        description: Unique UUID of the tag.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+    patch:
+      tags:
+      - Tag Groups
+      summary: Update a tag
+      operationId: updateTag
+      parameters:
+      - name: tagGroupId
+        in: path
+        description: Unique UUID of the tag group.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: tagId
+        in: path
+        description: Unique UUID of the tag.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: Tag has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /companies/balance:
+    get:
+      tags:
+      - Company
+      summary: Get company account balance
+      operationId: getCompanyBalance
+      parameters: []
+      responses:
+        "200":
+          description: Company balance has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyBalance'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /expenses/{expenseId}/receipts:
+    get:
+      tags:
+      - Receipts
+      summary: Get expense receipts
+      operationId: getExpenseReceipts
+      parameters:
+      - name: expenseId
+        in: path
+        description: Unique UUID of the expense.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An array of receipts info with the download URL will be returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipts'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /expenses/{expenseId}/receipts/{receiptId}:
+    get:
+      tags:
+      - Receipts
+      summary: Get an expense receipt
+      operationId: getExpenseReceipt
+      parameters:
+      - name: expenseId
+        in: path
+        description: Unique UUID of the expense.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: receiptId
+        in: path
+        description: Unique UUID of the receipt.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: The expense receipt details will be returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /employees/{employeeId}:
+    get:
+      tags:
+      - Employees
+      summary: Get an employee for a company
+      operationId: getEmployee
+      parameters:
+      - name: employeeId
+        in: path
+        description: Unique UUID of the employee.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An employee has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An employee does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Employees
+      summary: Update an employee for a company
+      operationId: updateEmployee
+      parameters:
+      - name: employeeId
+        in: path
+        description: Unique UUID of the employee.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/employees_employeeId_body'
+        required: true
+      responses:
+        "200":
+          description: An employee has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An employee does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Employees
+      summary: Delete an employee for a company
+      operationId: deleteEmployee
+      parameters:
+      - name: employeeId
+        in: path
+        description: Unique UUID of the employee.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /employees:
+    get:
+      tags:
+      - Employees
+      summary: Get company employees
+      operationId: getEmployees
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          nullable: false
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of employees to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+      responses:
+        "200":
+          description: Employees has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeesResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Employees
+      summary: Create an employee for a company
+      operationId: createEmployee
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An employee has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeCreationResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /accounts/{accountId}:
+    get:
+      tags:
+      - Accounts
+      summary: Get an account for a company
+      operationId: getAccount
+      parameters:
+      - name: accountId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An account has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Accounts
+      summary: Update an account for a company
+      operationId: updateAccount
+      parameters:
+      - name: accountId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Accounts
+      summary: Delete an account for a company
+      operationId: deleteAccount
+      parameters:
+      - name: accountId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /accounts:
+    get:
+      tags:
+      - Accounts
+      summary: Get company accounts
+      operationId: getAccounts
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          nullable: false
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of accounts to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+      responses:
+        "200":
+          description: Accounts has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Accounts
+      summary: Create an account for a company
+      operationId: createAccount
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /account-groups:
+    get:
+      tags:
+      - Accounts
+      summary: Get all company account groups
+      operationId: getAccountGroups
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          nullable: false
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of account groups to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+      responses:
+        "200":
+          description: Account groups has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Accounts
+      summary: Create an account group for a company
+      operationId: createAccountGroup
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountGroupCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account group has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /account-categories:
+    get:
+      tags:
+      - Experimental
+      - Deprecated
+      summary: Get all company account groups
+      operationId: getAccountGroupsV1_1
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          nullable: false
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of account groups to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+      responses:
+        "200":
+          description: Account groups has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Experimental
+      - Deprecated
+      summary: Create an account group for a company
+      operationId: createAccountGroupV1_1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountGroupCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account group has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /account-groups/{accountCategoryId}:
+    get:
+      tags:
+      - Accounts
+      summary: Get an account group for a company
+      operationId: getAccountGroup
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An account group has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account group does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Accounts
+      summary: Update an account group for a company
+      operationId: updateAccountGroup
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountGroupCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account group has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account group does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Accounts
+      summary: Delete an account group for a company
+      operationId: deleteAccountGroup
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /account-categories/{accountCategoryId}:
+    get:
+      tags:
+      - Experimental
+      - Deprecated
+      summary: Get an account group for a company
+      operationId: getAccountGroupV1_1
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: An account group has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account group does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Experimental
+      - Deprecated
+      summary: Update an account group for a company
+      operationId: updateAccountGroupV1_1
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountGroupCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: An account group has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountGroupResponse'
+        "400":
+          description: validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: An account group does not exist or does not match the company
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Experimental
+      - Deprecated
+      summary: Delete an account group for a company
+      operationId: deleteAccountGroupV1_1
+      parameters:
+      - name: accountCategoryId
+        in: path
+        description: Unique UUID of the account.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /teams:
+    get:
+      tags:
+      - Teams
+      summary: Get all teams for a company
+      operationId: getTeams
+      parameters:
+      - name: pageOffset
+        in: query
+        description: This is the pagination offset value. The record number you would
+          like to start from. This offset value starts at 0.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 150
+      - name: pageSize
+        in: query
+        description: The number of teams to return for each page.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          example: 10
+          default: 25
+      responses:
+        "200":
+          description: Teams have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    post:
+      tags:
+      - Teams
+      summary: Create a team for a company
+      operationId: createTeam
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamCreationRequest'
+        required: true
+      responses:
+        "200":
+          description: A team has been created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /teams/{teamId}:
+    get:
+      tags:
+      - Teams
+      summary: Get a team for a company
+      operationId: getTeam
+      parameters:
+      - name: teamId
+        in: path
+        description: Unique UUID of the team.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: A team has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    put:
+      tags:
+      - Teams
+      summary: Update a team for a company
+      operationId: updateTeam
+      parameters:
+      - name: teamId
+        in: path
+        description: Unique UUID of the team.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: A team has been updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+    delete:
+      tags:
+      - Teams
+      summary: Delete a team for a company
+      operationId: deleteTeam
+      parameters:
+      - name: teamId
+        in: path
+        description: Unique UUID of the team.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /teams/{teamId}/employees/{employeeId}:
+    put:
+      tags:
+      - Teams
+      summary: Add an employee to a team
+      operationId: addTeamEmployee
+      parameters:
+      - name: teamId
+        in: path
+        description: Unique UUID of the team.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: employeeId
+        in: path
+        description: Unique UUID of the employee.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+    delete:
+      tags:
+      - Teams
+      summary: Remove an employee from a team
+      operationId: deleteTeamEmployee
+      parameters:
+      - name: teamId
+        in: path
+        description: Unique UUID of the team.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      - name: employeeId
+        in: path
+        description: Unique UUID of the employee.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                x-content-type: application/json
+  /tax-codes/{taxCodeId}:
+    get:
+      tags:
+      - Tax Codes
+      summary: Get a tax code for a company
+      operationId: getTaxCode
+      parameters:
+      - name: taxCodeId
+        in: path
+        description: Unique UUID of the tax code.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+      responses:
+        "200":
+          description: A tax code has been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxCodeResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+  /tax-codes:
+    get:
+      tags:
+      - Tax Codes
+      summary: Get tax codes for a company
+      operationId: getTaxCodes
+      parameters:
+      - name: force
+        in: query
+        description: Force tax code list to reload.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: hidden
+        in: query
+        description: Include hidden tax codes.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Tax codes have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxCodesResponse'
+        "401":
+          description: request unauthorized
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultUnauthorizedResponse'
+        "403":
+          description: Request forbidden; user has insufficient rights to a resource.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/DefaultForbiddenResponse'
+        "404":
+          description: route not found
+        "500":
+          description: Something went wrong. Please contact the administrator if problems
+            persist.
+components:
+  schemas:
+    HealthCheckResponse:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+      description: Returns a healthcheck status for a given company.
+      example:
+        status: UP
+    DefaultUnauthorizedResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http response status code
+          example: 401
+        error:
+          type: string
+          description: error type
+          example: Forbidden
+        message:
+          type: string
+          description: error message
+          example: user_scope_insufficient
+    DefaultForbiddenResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          description: http response status code
+          example: 403
+        error:
+          type: string
+          description: error type
+          example: Forbidden
+        message:
+          type: string
+          description: error message
+          example: user_scope_insufficient
+    ExpenseResponse:
+      required:
+      - amountOriginal
+      - createdAt
+      - id
+      - lines
+      - performedAt
+      - status
+      - type
+      - updatedAt
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the expense
+        employeeId:
+          type: string
+          description: Unique UUID identifier of the employee that performed the expense
+          nullable: true
+        employeeCode:
+          type: string
+          description: External identifier of the employee that performed the expense
+          nullable: true
+        departmentId:
+          type: string
+          description: Unique UUID identifier of the department for which the employee
+            executing the expense belongs to
+          nullable: true
+        performedAt:
+          type: string
+          description: The date the expense was performed in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        amountOriginal:
+          $ref: '#/components/schemas/ExpenseResponse_amountOriginal'
+        amountSettled:
+          $ref: '#/components/schemas/ExpenseResponse_amountSettled'
+        note:
+          type: string
+          description: Additional comments on the expense added to enhance the purpose
+            of the expense
+          nullable: true
+        type:
+          type: string
+          description: The type of this expense.
+          nullable: false
+          enum:
+          - CARD
+          - PERSONAL_TRANSFER
+          - BILL_INVOICE
+          - BILL_INVOICE_PAYMENT
+          - LOAD
+          - MANUAL
+          - MANUAL_TRANSFER
+          - PLEO_INVOICE
+          - EMPLOYEE_BANK_TRANSFER
+          - CASHBACK
+          - OVERDRAFT_FEE
+          - OVERDRAFT_INTEREST
+        cardTransaction:
+          $ref: '#/components/schemas/ExpenseResponse_cardTransaction'
+        accountId:
+          type: string
+          description: "This is the UUID pleo accounting category identifier for this\
+            \ expense, e.g. entertainment, travel etc."
+          nullable: true
+        taxCodeId:
+          type: string
+          description: This is the UUID tax code identifier for this expense
+          nullable: true
+        tagIds:
+          type: array
+          description: "These are additional accounting-related information pertaining\
+            \ to the expense, these are usually extracted from the external accounting\
+            \ system."
+          items:
+            $ref: '#/components/schemas/ExpenseResponse_tagIds'
+        lines:
+          type: array
+          description: "This is a breakdown of the expense lines for this expense,\
+            \ could also be potentially empty for non-card related expenses"
+          items:
+            $ref: '#/components/schemas/ExpenseResponse_lines'
+        receiptIds:
+          type: array
+          description: Unique identifiers (UUIDs) for the receipts attached to this
+            expense
+          items:
+            type: string
+        settledExpenseIds:
+          type: array
+          description: Unique identifiers (UUIDs) of the related settled Expenses
+            in case the expense is a reimbursement of *TRANSFER family
+          items:
+            type: string
+        status:
+          type: string
+          description: This is related to export status information
+          nullable: false
+          enum:
+          - NOT_EXPORTED
+          - QUEUED
+          - EXPORTING
+          - EXPORTED
+        supplier:
+          $ref: '#/components/schemas/ExpenseResponse_supplier'
+        createdAt:
+          type: string
+          description: Date and time this record was created in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        updatedAt:
+          type: string
+          description: Date and time this record was last updated in the pleo system
+            in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        deletedAt:
+          type: string
+          description: Date and time this record was deleted in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+          nullable: true
+      example:
+        note: note
+        cardTransaction:
+          reversedAt: 2000-01-23T04:56:07.000+00:00
+          settledAt: 2000-01-23T04:56:07.000+00:00
+          authorizedAt: 2000-01-23T04:56:07.000+00:00
+          merchant:
+            name: name
+            id: id
+          state: AUTHORIZATION
+        departmentId: departmentId
+        tagIds:
+        - tagGroupId: tagGroupId
+          id: id
+        - tagGroupId: tagGroupId
+          id: id
+        employeeId: employeeId
+        receiptIds:
+        - receiptIds
+        - receiptIds
+        amountSettled:
+          currency: currency
+          value: 6.02745618307040320615897144307382404804229736328125
+        type: CARD
+        taxCodeId: taxCodeId
+        employeeCode: employeeCode
+        accountId: accountId
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        deletedAt: 2000-01-23T04:56:07.000+00:00
+        settledExpenseIds:
+        - settledExpenseIds
+        - settledExpenseIds
+        amountOriginal:
+          currency: currency
+          value: 0.80082819046101150206595775671303272247314453125
+        performedAt: 2000-01-23T04:56:07.000+00:00
+        supplier:
+          CIF: CIF
+          documentNumber: documentNumber
+        id: id
+        lines:
+        - accountId: accountId
+          tagIds:
+          - null
+          - null
+          amountSettled:
+            currency: currency
+            value: 1.46581298050294517310021547018550336360931396484375
+          taxCodeId: taxCodeId
+        - accountId: accountId
+          tagIds:
+          - null
+          - null
+          amountSettled:
+            currency: currency
+            value: 1.46581298050294517310021547018550336360931396484375
+          taxCodeId: taxCodeId
+        status: NOT_EXPORTED
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+    ExpensesResponse:
+      required:
+      - expenses
+      - metadata
+      type: object
+      properties:
+        expenses:
+          type: array
+          description: A list of expenses fetched for the requested page
+          items:
+            $ref: '#/components/schemas/ExpensesResponse_expenses'
+        metadata:
+          $ref: '#/components/schemas/ExpensesResponse_metadata'
+      example:
+        metadata:
+          pageInfo:
+            nextPageOffset: 0.80082819046101150206595775671303272247314453125
+            pageSize: 6.02745618307040320615897144307382404804229736328125
+            totalCount: 1.46581298050294517310021547018550336360931396484375
+        expenses:
+        - note: note
+          cardTransaction:
+            reversedAt: 2000-01-23T04:56:07.000+00:00
+            settledAt: 2000-01-23T04:56:07.000+00:00
+            authorizedAt: 2000-01-23T04:56:07.000+00:00
+            merchant:
+              name: name
+              id: id
+            state: AUTHORIZATION
+          departmentId: departmentId
+          tagIds:
+          - tagGroupId: tagGroupId
+            id: id
+          - tagGroupId: tagGroupId
+            id: id
+          employeeId: employeeId
+          receiptIds:
+          - receiptIds
+          - receiptIds
+          amountSettled:
+            currency: currency
+            value: 6.02745618307040320615897144307382404804229736328125
+          type: CARD
+          taxCodeId: taxCodeId
+          employeeCode: employeeCode
+          accountId: accountId
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          deletedAt: 2000-01-23T04:56:07.000+00:00
+          settledExpenseIds:
+          - settledExpenseIds
+          - settledExpenseIds
+          amountOriginal:
+            currency: currency
+            value: 0.80082819046101150206595775671303272247314453125
+          performedAt: 2000-01-23T04:56:07.000+00:00
+          supplier:
+            CIF: CIF
+            documentNumber: documentNumber
+          id: id
+          lines:
+          - accountId: accountId
+            tagIds:
+            - null
+            - null
+            amountSettled:
+              currency: currency
+              value: 1.46581298050294517310021547018550336360931396484375
+            taxCodeId: taxCodeId
+          - accountId: accountId
+            tagIds:
+            - null
+            - null
+            amountSettled:
+              currency: currency
+              value: 1.46581298050294517310021547018550336360931396484375
+            taxCodeId: taxCodeId
+          status: NOT_EXPORTED
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - note: note
+          cardTransaction:
+            reversedAt: 2000-01-23T04:56:07.000+00:00
+            settledAt: 2000-01-23T04:56:07.000+00:00
+            authorizedAt: 2000-01-23T04:56:07.000+00:00
+            merchant:
+              name: name
+              id: id
+            state: AUTHORIZATION
+          departmentId: departmentId
+          tagIds:
+          - tagGroupId: tagGroupId
+            id: id
+          - tagGroupId: tagGroupId
+            id: id
+          employeeId: employeeId
+          receiptIds:
+          - receiptIds
+          - receiptIds
+          amountSettled:
+            currency: currency
+            value: 6.02745618307040320615897144307382404804229736328125
+          type: CARD
+          taxCodeId: taxCodeId
+          employeeCode: employeeCode
+          accountId: accountId
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          deletedAt: 2000-01-23T04:56:07.000+00:00
+          settledExpenseIds:
+          - settledExpenseIds
+          - settledExpenseIds
+          amountOriginal:
+            currency: currency
+            value: 0.80082819046101150206595775671303272247314453125
+          performedAt: 2000-01-23T04:56:07.000+00:00
+          supplier:
+            CIF: CIF
+            documentNumber: documentNumber
+          id: id
+          lines:
+          - accountId: accountId
+            tagIds:
+            - null
+            - null
+            amountSettled:
+              currency: currency
+              value: 1.46581298050294517310021547018550336360931396484375
+            taxCodeId: taxCodeId
+          - accountId: accountId
+            tagIds:
+            - null
+            - null
+            amountSettled:
+              currency: currency
+              value: 1.46581298050294517310021547018550336360931396484375
+            taxCodeId: taxCodeId
+          status: NOT_EXPORTED
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+    ExpensesUpdateRequest:
+      required:
+      - expenseIds
+      - status
+      type: object
+      properties:
+        expenseIds:
+          type: array
+          description: An array of unique expense UUIDs to update their statuses.
+          example: "[\"0f0e000-000d-0d00-000b-00db0d000fae\", \"f0bd2ac4-9080-11eb-a8b3-0242ac130003\"\
+            ]"
+          items:
+            type: string
+        status:
+          type: string
+          description: Status the expenses listed in the expenseIds field will be
+            updated to.
+          nullable: false
+          enum:
+          - NOT_EXPORTED
+          - QUEUED
+          - EXPORTING
+          - EXPORTED
+    TagGroupsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagGroupsResponse_inner'
+      x-schema-name: TagGroupsResponse
+    TagGroupResponse:
+      required:
+      - archived
+      - id
+      - name
+      - tagAttributes
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag group
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        name:
+          type: string
+          description: This is the tag group name supplied on create
+        tagAttributes:
+          type: array
+          description: "These are the attributes that define a tag in this tag group,\
+            \ i.e. the tag columns. Each tag column is included only once."
+          items:
+            $ref: '#/components/schemas/TagGroupResponse_tagAttributes'
+        archived:
+          type: boolean
+          description: This flag specifies whether the tag group has been archived
+            in the Pleo system or not
+      example:
+        archived: true
+        tagAttributes:
+        - hidden: true
+          name: name
+          displayOrder: 0.80082819046101150206595775671303272247314453125
+          id: 0f0e000-000d-0d00-000b-00db0d000fae
+        - hidden: true
+          name: name
+          displayOrder: 0.80082819046101150206595775671303272247314453125
+          id: 0f0e000-000d-0d00-000b-00db0d000fae
+        name: name
+        id: 0f0e000-000d-0d00-000b-00db0d000fae
+    TagGroupCreationRequest:
+      required:
+      - name
+      - tagAttributes
+      type: object
+      properties:
+        name:
+          type: string
+          description: This is the tag group name supplied on create
+        tagAttributes:
+          type: array
+          description: These are the attributes that define a tag in this tag group
+          items:
+            $ref: '#/components/schemas/TagGroupCreationRequest_tagAttributes'
+    UpdateTagGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: This is the tag group name supplied on create
+        tagAttributes:
+          type: array
+          description: These are the attributes that define a tag in this tag group
+          items:
+            $ref: '#/components/schemas/UpdateTagGroupRequest_tagAttributes'
+        archived:
+          type: boolean
+          description: This flag specifies whether the tag group has been archived
+            in the pleo system or not
+    TagsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TagsResponse_inner'
+      x-schema-name: TagsResponse
+    TagResponse:
+      required:
+      - attributeValues
+      - displayOrder
+      - hidden
+      - id
+      - tagGroupId
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        tagGroupId:
+          type: string
+          description: This is the internal pleo identifier of the tag group this
+            tag belongs to
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        attributeValues:
+          type: array
+          description: These are the attributes and their values assigned to this
+            tag
+          items:
+            $ref: '#/components/schemas/TagResponse_attributeValues'
+        displayOrder:
+          type: number
+          description: This is the display order position for this tag when displayed
+            in a list.
+          nullable: true
+        hidden:
+          type: boolean
+          description: This flag specifies if the tag is hidden and not visible for
+            use in pleo when tagging expenses.
+      example:
+        tagGroupId: 0f0e000-000d-0d00-000b-00db0d000fae
+        hidden: true
+        attributeValues:
+        - attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+          value: value
+        - attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+          value: value
+        displayOrder: 0.80082819046101150206595775671303272247314453125
+        id: 0f0e000-000d-0d00-000b-00db0d000fae
+    TagCreationRequest:
+      required:
+      - attributeValues
+      type: object
+      properties:
+        attributeValues:
+          type: array
+          description: These are the attributes and their values assigned to this
+            tag
+          items:
+            $ref: '#/components/schemas/TagResponse_attributeValues'
+    TagUpdateRequest:
+      type: object
+      properties:
+        displayOrder:
+          type: number
+          description: This is the display order position for this tag when displayed
+            in a list.
+          nullable: true
+        hidden:
+          type: boolean
+          description: This flag specifies if the tag is hidden and not visible for
+            use in pleo when tagging expenses.
+    CompanyBalance:
+      required:
+      - available
+      - currency
+      - current
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Company wallet currency.
+          nullable: false
+          enum:
+          - DKK
+          - SEK
+          - EUR
+          - GBP
+          - NOK
+          - USD
+        current:
+          type: number
+          description: All available funds including unsettled transactions.
+        available:
+          type: number
+          description: Funds available for use.
+      example:
+        current: 0.80082819046101150206595775671303272247314453125
+        available: 6.02745618307040320615897144307382404804229736328125
+        currency: DKK
+    Receipts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Receipts_inner'
+      x-schema-name: Receipts
+    Receipt:
+      required:
+      - id
+      - mimeType
+      - name
+      - size
+      - url
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the receipt
+        name:
+          type: string
+          description: File name of the receipt
+        url:
+          type: string
+          description: Download URL of the receipt (remains valid for 15 hours)
+        mimeType:
+          type: string
+          description: Mime type of the file
+        size:
+          type: number
+          description: Size of the file in KB
+      example:
+        size: 0.80082819046101150206595775671303272247314453125
+        name: name
+        id: id
+        mimeType: mimeType
+        url: url
+    EmployeeResponse:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the employee
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        email:
+          type: string
+          description: Email
+        jobTitle:
+          type: string
+          description: Job title
+          nullable: true
+        role:
+          type: string
+          description: Role
+          nullable: true
+        phone:
+          type: string
+          description: Phone number
+          nullable: true
+        avatar:
+          $ref: '#/components/schemas/EmployeeResponse_avatar'
+        code:
+          type: string
+          description: External Id
+          nullable: true
+        teamId:
+          type: string
+          description: Team identifier
+          nullable: true
+      example:
+        firstName: firstName
+        lastName: lastName
+        role: role
+        code: code
+        phone: phone
+        jobTitle: jobTitle
+        teamId: teamId
+        id: id
+        avatar:
+          url: url
+        email: email
+    ErrorResponse:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        error:
+          type: string
+        message:
+          type: string
+    EmployeesResponse:
+      required:
+      - metadata
+      type: object
+      properties:
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeesResponse_employees'
+        metadata:
+          $ref: '#/components/schemas/ExpensesResponse_metadata'
+      example:
+        metadata:
+          pageInfo:
+            nextPageOffset: 0.80082819046101150206595775671303272247314453125
+            pageSize: 6.02745618307040320615897144307382404804229736328125
+            totalCount: 1.46581298050294517310021547018550336360931396484375
+        employees:
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+    EmployeeCreationRequest:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+          description: Employee email
+    EmployeeCreationResponse:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the employee
+      example:
+        id: id
+    AccountResponse:
+      required:
+      - accountCategoryId
+      - hidden
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the account
+        accountNumber:
+          type: string
+          description: Account number
+        taxCodeId:
+          type: string
+          description: unique Tax Code ID
+        name:
+          type: string
+          description: Description of this account
+        accountCategoryId:
+          type: string
+          description: unique Category ID of the account
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+      example:
+        hidden: true
+        name: name
+        id: id
+        accountNumber: accountNumber
+        taxCodeId: taxCodeId
+        accountCategoryId: accountCategoryId
+    AccountsResponse:
+      required:
+      - metadata
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsResponse_accounts'
+        metadata:
+          $ref: '#/components/schemas/ExpensesResponse_metadata'
+      example:
+        metadata:
+          pageInfo:
+            nextPageOffset: 0.80082819046101150206595775671303272247314453125
+            pageSize: 6.02745618307040320615897144307382404804229736328125
+            totalCount: 1.46581298050294517310021547018550336360931396484375
+        accounts:
+        - hidden: true
+          name: name
+          id: id
+          accountNumber: accountNumber
+          taxCodeId: taxCodeId
+          accountCategoryId: accountCategoryId
+        - hidden: true
+          name: name
+          id: id
+          accountNumber: accountNumber
+          taxCodeId: taxCodeId
+          accountCategoryId: accountCategoryId
+    AccountCreationRequest:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+          description: Account number
+        name:
+          type: string
+          description: Description of this account
+        taxCodeId:
+          type: string
+          description: unique Tax Code ID
+        accountCategoryId:
+          type: string
+          description: unique Category ID of the account
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+    AccountGroupsResponse:
+      required:
+      - metadata
+      type: object
+      properties:
+        accountGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountGroupsResponse_accountGroups'
+        metadata:
+          $ref: '#/components/schemas/ExpensesResponse_metadata'
+      example:
+        metadata:
+          pageInfo:
+            nextPageOffset: 0.80082819046101150206595775671303272247314453125
+            pageSize: 6.02745618307040320615897144307382404804229736328125
+            totalCount: 1.46581298050294517310021547018550336360931396484375
+        accountGroups:
+        - typeKey: entertainment
+          hidden: true
+          name: name
+          id: id
+        - typeKey: entertainment
+          hidden: true
+          name: name
+          id: id
+    GetAccountGroupResponse:
+      required:
+      - hidden
+      - id
+      - name
+      - typeKey
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the account group
+        name:
+          type: string
+          description: Description of the account group
+        typeKey:
+          type: string
+          description: Type key of the account group
+          nullable: false
+          enum:
+          - entertainment
+          - equipment_and_hardware
+          - marketing_and_advertising
+          - meals_and_drinks
+          - office_expenses
+          - phone_and_internet
+          - services_and_consultancy
+          - software
+          - supplies
+          - travel
+          - other
+          - no_suitable_category
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountsResponse_accounts'
+      example:
+        typeKey: entertainment
+        hidden: true
+        name: name
+        id: id
+        accounts:
+        - hidden: true
+          name: name
+          id: id
+          accountNumber: accountNumber
+          taxCodeId: taxCodeId
+          accountCategoryId: accountCategoryId
+        - hidden: true
+          name: name
+          id: id
+          accountNumber: accountNumber
+          taxCodeId: taxCodeId
+          accountCategoryId: accountCategoryId
+    AccountGroupCreationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Description of the account group
+        typeKey:
+          type: string
+          description: Type key of the account group
+          nullable: false
+          enum:
+          - entertainment
+          - equipment_and_hardware
+          - marketing_and_advertising
+          - meals_and_drinks
+          - office_expenses
+          - phone_and_internet
+          - services_and_consultancy
+          - software
+          - supplies
+          - travel
+          - other
+          - no_suitable_category
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+    AccountGroupResponse:
+      required:
+      - hidden
+      - id
+      - name
+      - typeKey
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the account group
+        name:
+          type: string
+          description: Description of the account group
+        typeKey:
+          type: string
+          description: Type key of the account group
+          nullable: false
+          enum:
+          - entertainment
+          - equipment_and_hardware
+          - marketing_and_advertising
+          - meals_and_drinks
+          - office_expenses
+          - phone_and_internet
+          - services_and_consultancy
+          - software
+          - supplies
+          - travel
+          - other
+          - no_suitable_category
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+      example:
+        typeKey: entertainment
+        hidden: true
+        name: name
+        id: id
+    TeamCreationRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Team name
+        code:
+          type: string
+          description: Team code
+          nullable: true
+    TeamResponse:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the department
+        name:
+          type: string
+          description: Name of the department
+        code:
+          type: string
+          description: Code of the department
+          nullable: true
+        employees:
+          type: array
+          description: Team employee
+          items:
+            $ref: '#/components/schemas/EmployeesResponse_employees'
+        reviewers:
+          type: array
+          description: Team reviewers
+          items:
+            $ref: '#/components/schemas/EmployeesResponse_employees'
+      example:
+        code: code
+        name: name
+        id: id
+        employees:
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+        reviewers:
+        - null
+        - null
+    TeamUpdateRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Team name
+        code:
+          type: string
+          description: Team code
+          nullable: true
+    TeamsResponse:
+      required:
+      - teams
+      type: object
+      properties:
+        teams:
+          type: array
+          description: A list of teams fetched for the requested page
+          items:
+            $ref: '#/components/schemas/TeamsResponse_teams'
+      example:
+        teams:
+        - code: code
+          name: name
+          id: id
+          employees:
+          - firstName: firstName
+            lastName: lastName
+            role: role
+            code: code
+            phone: phone
+            jobTitle: jobTitle
+            teamId: teamId
+            id: id
+            avatar:
+              url: url
+            email: email
+          - firstName: firstName
+            lastName: lastName
+            role: role
+            code: code
+            phone: phone
+            jobTitle: jobTitle
+            teamId: teamId
+            id: id
+            avatar:
+              url: url
+            email: email
+          reviewers:
+          - null
+          - null
+        - code: code
+          name: name
+          id: id
+          employees:
+          - firstName: firstName
+            lastName: lastName
+            role: role
+            code: code
+            phone: phone
+            jobTitle: jobTitle
+            teamId: teamId
+            id: id
+            avatar:
+              url: url
+            email: email
+          - firstName: firstName
+            lastName: lastName
+            role: role
+            code: code
+            phone: phone
+            jobTitle: jobTitle
+            teamId: teamId
+            id: id
+            avatar:
+              url: url
+            email: email
+          reviewers:
+          - null
+          - null
+    TaxCodeResponse:
+      required:
+      - enabled
+      - id
+      - name
+      - rate
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the tax code.
+        name:
+          type: string
+          description: The name of the tax.
+        code:
+          type: string
+          description: The short code of the tax.
+          nullable: true
+        rate:
+          type: number
+          description: This is the rate of the tax code.
+        type:
+          type: string
+          description: This is the type of the tax code. Can be "normal" or "reverse".
+          nullable: false
+          default: normal
+          enum:
+          - NORMAL
+          - REVERSE
+        ingoingTaxAccount:
+          type: string
+          description: This is the ingoing account related to the tax codes.
+        outgoingTaxAccount:
+          type: string
+          description: This is the outgoing account related to the tax codes.
+        enabled:
+          type: boolean
+          description: This value is true if the tax code is not hidden.
+        createdAt:
+          type: string
+          description: Date and time this record was created in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        updatedAt:
+          type: string
+          description: Date and time this record was last updated in the pleo system
+            in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        deletedAt:
+          type: string
+          description: Date and time this record was deleted in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+          nullable: true
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        deletedAt: 2000-01-23T04:56:07.000+00:00
+        code: code
+        rate: 0.80082819046101150206595775671303272247314453125
+        ingoingTaxAccount: ingoingTaxAccount
+        name: name
+        id: id
+        outgoingTaxAccount: outgoingTaxAccount
+        type: normal
+        enabled: true
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+    TaxCodesResponse:
+      required:
+      - taxCodes
+      type: object
+      properties:
+        taxCodes:
+          type: array
+          description: A list of tax codes fetched for the requested page
+          items:
+            $ref: '#/components/schemas/TaxCodesResponse_taxCodes'
+      example:
+        taxCodes:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          deletedAt: 2000-01-23T04:56:07.000+00:00
+          code: code
+          rate: 0.80082819046101150206595775671303272247314453125
+          ingoingTaxAccount: ingoingTaxAccount
+          name: name
+          id: id
+          outgoingTaxAccount: outgoingTaxAccount
+          type: normal
+          enabled: true
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          deletedAt: 2000-01-23T04:56:07.000+00:00
+          code: code
+          rate: 0.80082819046101150206595775671303272247314453125
+          ingoingTaxAccount: ingoingTaxAccount
+          name: name
+          id: id
+          outgoingTaxAccount: outgoingTaxAccount
+          type: normal
+          enabled: true
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+    employees_employeeId_body:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        email:
+          type: string
+          description: Email
+        jobTitle:
+          type: string
+          description: Job title
+          nullable: true
+        phone:
+          type: string
+          description: Phone number
+          nullable: true
+        code:
+          type: string
+          description: External Id
+          nullable: true
+    ExpenseResponse_amountOriginal:
+      required:
+      - currency
+      - value
+      type: object
+      properties:
+        value:
+          type: number
+        currency:
+          type: string
+          description: 3-Letter currency code
+      description: The amount and currency the transaction was originally in
+      example:
+        currency: currency
+        value: 0.80082819046101150206595775671303272247314453125
+    ExpenseResponse_amountSettled:
+      required:
+      - currency
+      - value
+      type: object
+      properties:
+        value:
+          type: number
+        currency:
+          type: string
+          description: 3-Letter currency code
+      description: The settlement amount and currency
+      nullable: true
+      example:
+        currency: currency
+        value: 6.02745618307040320615897144307382404804229736328125
+    ExpenseResponse_cardTransaction_merchant:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Merchant payment processor merchant identifier
+          nullable: true
+        name:
+          type: string
+          description: Name of the merchant
+      description: Merchant the transaction was executed at
+      example:
+        name: name
+        id: id
+    ExpenseResponse_cardTransaction:
+      required:
+      - merchant
+      - state
+      type: object
+      properties:
+        state:
+          type: string
+          description: This is the transaction state of this card transaction.
+          nullable: false
+          enum:
+          - AUTHORIZATION
+          - AUTHORIZATION_REVERSAL
+          - CHARGE_BACK
+          - CHARGE_BACK_REVERSAL
+          - PRESENTMENT
+          - SECOND_PRESENTMENT
+          - REFUND
+          - LOAD
+          - UNLOAD
+          - FAILED
+          - MANUAL
+        authorizedAt:
+          type: string
+          description: Date and time the transaction was authorized in the format
+            YYYY-MM-DDTHH:mi:ss.SSSZ.
+          format: date-time
+          nullable: true
+        settledAt:
+          type: string
+          description: Date and time the transaction was settled in the pleo wallet
+            currency in the format YYYY-MM-DDTHH:mi:ss.SSSZ.
+          format: date-time
+          nullable: true
+        reversedAt:
+          type: string
+          description: Date and time the transaction was reversed if the transaction
+            is in a reversal state in the format YYYY-MM-DDTHH:mi:ss.SSSZ.
+          format: date-time
+          nullable: true
+        merchant:
+          $ref: '#/components/schemas/ExpenseResponse_cardTransaction_merchant'
+      description: This is the card transaction details of this expense specifically
+        related CARD expense types.
+      nullable: true
+      example:
+        reversedAt: 2000-01-23T04:56:07.000+00:00
+        settledAt: 2000-01-23T04:56:07.000+00:00
+        authorizedAt: 2000-01-23T04:56:07.000+00:00
+        merchant:
+          name: name
+          id: id
+        state: AUTHORIZATION
+    ExpenseResponse_tagIds:
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the UUID of the tag attached to the expense
+        tagGroupId:
+          type: string
+          description: UUID for the tag group to which expense tags are attached
+      example:
+        tagGroupId: tagGroupId
+        id: id
+    ExpenseResponse_amountSettled_1:
+      required:
+      - currency
+      - value
+      type: object
+      properties:
+        value:
+          type: number
+        currency:
+          type: string
+          description: 3-Letter currency code
+      description: The breakdown settlement amount and currency for this expense line
+      example:
+        currency: currency
+        value: 1.46581298050294517310021547018550336360931396484375
+    ExpenseResponse_lines:
+      required:
+      - amountSettled
+      type: object
+      properties:
+        amountSettled:
+          $ref: '#/components/schemas/ExpenseResponse_amountSettled_1'
+        accountId:
+          type: string
+          description: "This is the UUID pleo accounting category identifier for this\
+            \ expense line, e.g. entertainment, travel etc."
+          nullable: true
+        taxCodeId:
+          type: string
+          description: This is the UUID tax code identifier for this expense line
+          nullable: true
+        tagIds:
+          type: array
+          description: "These are additional accounting-related information pertaining\
+            \ to the expense, these are usually extracted from the external accounting\
+            \ system."
+          items:
+            $ref: '#/components/schemas/ExpenseResponse_tagIds'
+      example:
+        accountId: accountId
+        tagIds:
+        - null
+        - null
+        amountSettled:
+          currency: currency
+          value: 1.46581298050294517310021547018550336360931396484375
+        taxCodeId: taxCodeId
+    ExpenseResponse_supplier:
+      type: object
+      properties:
+        CIF:
+          type: string
+          description: CIF code of the expense
+          nullable: true
+        documentNumber:
+          type: string
+          description: Document number of the expense
+          nullable: true
+      description: Expense supplier information.
+      nullable: true
+      example:
+        CIF: CIF
+        documentNumber: documentNumber
+    ExpensesResponse_expenses:
+      required:
+      - amountOriginal
+      - createdAt
+      - id
+      - lines
+      - performedAt
+      - status
+      - type
+      - updatedAt
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the expense
+        employeeId:
+          type: string
+          description: Unique UUID identifier of the employee that performed the expense
+          nullable: true
+        employeeCode:
+          type: string
+          description: External identifier of the employee that performed the expense
+          nullable: true
+        departmentId:
+          type: string
+          description: Unique UUID identifier of the department for which the employee
+            executing the expense belongs to
+          nullable: true
+        performedAt:
+          type: string
+          description: The date the expense was performed in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        amountOriginal:
+          $ref: '#/components/schemas/ExpenseResponse_amountOriginal'
+        amountSettled:
+          $ref: '#/components/schemas/ExpenseResponse_amountSettled'
+        note:
+          type: string
+          description: Additional comments on the expense added to enhance the purpose
+            of the expense
+          nullable: true
+        type:
+          type: string
+          description: The type of this expense.
+          nullable: false
+          enum:
+          - CARD
+          - PERSONAL_TRANSFER
+          - BILL_INVOICE
+          - BILL_INVOICE_PAYMENT
+          - LOAD
+          - MANUAL
+          - MANUAL_TRANSFER
+          - PLEO_INVOICE
+          - EMPLOYEE_BANK_TRANSFER
+          - CASHBACK
+          - OVERDRAFT_FEE
+          - OVERDRAFT_INTEREST
+        cardTransaction:
+          $ref: '#/components/schemas/ExpenseResponse_cardTransaction'
+        accountId:
+          type: string
+          description: "This is the UUID pleo accounting category identifier for this\
+            \ expense, e.g. entertainment, travel etc."
+          nullable: true
+        taxCodeId:
+          type: string
+          description: This is the UUID tax code identifier for this expense
+          nullable: true
+        tagIds:
+          type: array
+          description: "These are additional accounting-related information pertaining\
+            \ to the expense, these are usually extracted from the external accounting\
+            \ system."
+          items:
+            $ref: '#/components/schemas/ExpenseResponse_tagIds'
+        lines:
+          type: array
+          description: "This is a breakdown of the expense lines for this expense,\
+            \ could also be potentially empty for non-card related expenses"
+          items:
+            $ref: '#/components/schemas/ExpenseResponse_lines'
+        receiptIds:
+          type: array
+          description: Unique identifiers (UUIDs) for the receipts attached to this
+            expense
+          items:
+            type: string
+        settledExpenseIds:
+          type: array
+          description: Unique identifiers (UUIDs) of the related settled Expenses
+            in case the expense is a reimbursement of *TRANSFER family
+          items:
+            type: string
+        status:
+          type: string
+          description: This is related to export status information
+          nullable: false
+          enum:
+          - NOT_EXPORTED
+          - QUEUED
+          - EXPORTING
+          - EXPORTED
+        supplier:
+          $ref: '#/components/schemas/ExpenseResponse_supplier'
+        createdAt:
+          type: string
+          description: Date and time this record was created in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        updatedAt:
+          type: string
+          description: Date and time this record was last updated in the pleo system
+            in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        deletedAt:
+          type: string
+          description: Date and time this record was deleted in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+          nullable: true
+      example:
+        note: note
+        cardTransaction:
+          reversedAt: 2000-01-23T04:56:07.000+00:00
+          settledAt: 2000-01-23T04:56:07.000+00:00
+          authorizedAt: 2000-01-23T04:56:07.000+00:00
+          merchant:
+            name: name
+            id: id
+          state: AUTHORIZATION
+        departmentId: departmentId
+        tagIds:
+        - tagGroupId: tagGroupId
+          id: id
+        - tagGroupId: tagGroupId
+          id: id
+        employeeId: employeeId
+        receiptIds:
+        - receiptIds
+        - receiptIds
+        amountSettled:
+          currency: currency
+          value: 6.02745618307040320615897144307382404804229736328125
+        type: CARD
+        taxCodeId: taxCodeId
+        employeeCode: employeeCode
+        accountId: accountId
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        deletedAt: 2000-01-23T04:56:07.000+00:00
+        settledExpenseIds:
+        - settledExpenseIds
+        - settledExpenseIds
+        amountOriginal:
+          currency: currency
+          value: 0.80082819046101150206595775671303272247314453125
+        performedAt: 2000-01-23T04:56:07.000+00:00
+        supplier:
+          CIF: CIF
+          documentNumber: documentNumber
+        id: id
+        lines:
+        - accountId: accountId
+          tagIds:
+          - null
+          - null
+          amountSettled:
+            currency: currency
+            value: 1.46581298050294517310021547018550336360931396484375
+          taxCodeId: taxCodeId
+        - accountId: accountId
+          tagIds:
+          - null
+          - null
+          amountSettled:
+            currency: currency
+            value: 1.46581298050294517310021547018550336360931396484375
+          taxCodeId: taxCodeId
+        status: NOT_EXPORTED
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+    ExpensesResponse_metadata_pageInfo:
+      required:
+      - pageSize
+      - totalCount
+      type: object
+      properties:
+        nextPageOffset:
+          type: number
+          description: The row number that should be used in the next fetch for the
+            next page offset
+          nullable: true
+        pageSize:
+          type: number
+          description: The number of items returned in this page
+        totalCount:
+          type: number
+          description: The total number of items mapped to the filter criteria supplied
+      description: Pagination information.
+      example:
+        nextPageOffset: 0.80082819046101150206595775671303272247314453125
+        pageSize: 6.02745618307040320615897144307382404804229736328125
+        totalCount: 1.46581298050294517310021547018550336360931396484375
+    ExpensesResponse_metadata:
+      type: object
+      properties:
+        pageInfo:
+          $ref: '#/components/schemas/ExpensesResponse_metadata_pageInfo'
+      description: Additional metadata including pagination information
+      example:
+        pageInfo:
+          nextPageOffset: 0.80082819046101150206595775671303272247314453125
+          pageSize: 6.02745618307040320615897144307382404804229736328125
+          totalCount: 1.46581298050294517310021547018550336360931396484375
+    TagGroupsResponse_inner:
+      required:
+      - archived
+      - id
+      - name
+      - tagAttributes
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag group
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        name:
+          type: string
+          description: This is the tag group name supplied on create
+        tagAttributes:
+          type: array
+          description: "These are the attributes that define a tag in this tag group,\
+            \ i.e. the tag columns. Each tag column is included only once."
+          items:
+            required:
+            - displayOrder
+            - hidden
+            - id
+            - name
+            type: object
+            properties:
+              id:
+                type: string
+                description: This is the internal pleo identifier of the tag group
+                example: 0f0e000-000d-0d00-000b-00db0d000fae
+              name:
+                type: string
+                description: This is the tag group name supplied on create
+              displayOrder:
+                type: number
+                description: This number specifies the order in which these attributes
+                  are displayed in pleo.
+                nullable: true
+              hidden:
+                type: boolean
+                description: This flag specifies the column used as a display value
+                  for the customer when applying the tag on an expense. Non-hidden
+                  column values will be concatenated and used as the display
+            example:
+              hidden: true
+              name: name
+              displayOrder: 0.80082819046101150206595775671303272247314453125
+              id: 0f0e000-000d-0d00-000b-00db0d000fae
+        archived:
+          type: boolean
+          description: This flag specifies whether the tag group has been archived
+            in the Pleo system or not
+      example:
+        archived: true
+        tagAttributes:
+        - hidden: true
+          name: name
+          displayOrder: 0.80082819046101150206595775671303272247314453125
+          id: 0f0e000-000d-0d00-000b-00db0d000fae
+        - hidden: true
+          name: name
+          displayOrder: 0.80082819046101150206595775671303272247314453125
+          id: 0f0e000-000d-0d00-000b-00db0d000fae
+        name: name
+        id: 0f0e000-000d-0d00-000b-00db0d000fae
+    TagGroupResponse_tagAttributes:
+      required:
+      - displayOrder
+      - hidden
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag group
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        name:
+          type: string
+          description: This is the tag group name supplied on create
+        displayOrder:
+          type: number
+          description: This number specifies the order in which these attributes are
+            displayed in pleo.
+          nullable: true
+        hidden:
+          type: boolean
+          description: This flag specifies the column used as a display value for
+            the customer when applying the tag on an expense. Non-hidden column values
+            will be concatenated and used as the display
+      example:
+        hidden: true
+        name: name
+        displayOrder: 0.80082819046101150206595775671303272247314453125
+        id: 0f0e000-000d-0d00-000b-00db0d000fae
+    TagGroupCreationRequest_tagAttributes:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: This is the tag group name
+        displayOrder:
+          type: number
+          description: This number specifies the order in which these attributes are
+            displayed in pleo.
+    UpdateTagGroupRequest_tagAttributes:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag group
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        name:
+          type: string
+          description: This is the tag group name
+        displayOrder:
+          type: number
+          description: This number specifies the order in which these attributes are
+            displayed in pleo.
+        hidden:
+          type: boolean
+          description: This flag specifies the attribute used as a display value for
+            the customer when applying the tag on an expense.
+    TagsResponse_inner:
+      required:
+      - attributeValues
+      - displayOrder
+      - hidden
+      - id
+      - tagGroupId
+      type: object
+      properties:
+        id:
+          type: string
+          description: This is the internal pleo identifier of the tag
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        tagGroupId:
+          type: string
+          description: This is the internal pleo identifier of the tag group this
+            tag belongs to
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        attributeValues:
+          type: array
+          description: These are the attributes and their values assigned to this
+            tag
+          items:
+            required:
+            - attributeId
+            - value
+            type: object
+            properties:
+              attributeId:
+                type: string
+                description: This is the internal pleo identifier of the created tag
+                  group attribute
+                example: 0f0e000-000d-0d00-000b-00db0d000fae
+              value:
+                type: string
+                description: This is the value assigned to this attribute of the tag
+            example:
+              attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+              value: value
+        displayOrder:
+          type: number
+          description: This is the display order position for this tag when displayed
+            in a list.
+          nullable: true
+        hidden:
+          type: boolean
+          description: This flag specifies if the tag is hidden and not visible for
+            use in pleo when tagging expenses.
+      example:
+        tagGroupId: 0f0e000-000d-0d00-000b-00db0d000fae
+        hidden: true
+        attributeValues:
+        - attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+          value: value
+        - attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+          value: value
+        displayOrder: 0.80082819046101150206595775671303272247314453125
+        id: 0f0e000-000d-0d00-000b-00db0d000fae
+    TagResponse_attributeValues:
+      required:
+      - attributeId
+      - value
+      type: object
+      properties:
+        attributeId:
+          type: string
+          description: This is the internal pleo identifier of the created tag group
+            attribute
+          example: 0f0e000-000d-0d00-000b-00db0d000fae
+        value:
+          type: string
+          description: This is the value assigned to this attribute of the tag
+      example:
+        attributeId: 0f0e000-000d-0d00-000b-00db0d000fae
+        value: value
+    Receipts_inner:
+      required:
+      - id
+      - mimeType
+      - name
+      - size
+      - url
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the receipt
+        name:
+          type: string
+          description: File name of the receipt
+        url:
+          type: string
+          description: Download URL of the receipt (remains valid for 15 hours)
+        mimeType:
+          type: string
+          description: Mime type of the file
+        size:
+          type: number
+          description: Size of the file in KB
+      example:
+        size: 0.80082819046101150206595775671303272247314453125
+        name: name
+        id: id
+        mimeType: mimeType
+        url: url
+    EmployeeResponse_avatar:
+      type: object
+      properties:
+        url:
+          type: string
+          description: Employee avatar location
+          nullable: true
+      example:
+        url: url
+    EmployeesResponse_employees:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the employee
+        firstName:
+          type: string
+          description: Employee first name
+        lastName:
+          type: string
+          description: Employee last name
+        email:
+          type: string
+          description: Email
+        jobTitle:
+          type: string
+          description: Job title
+          nullable: true
+        role:
+          type: string
+          description: Role
+          nullable: true
+        phone:
+          type: string
+          description: Phone number
+          nullable: true
+        avatar:
+          $ref: '#/components/schemas/EmployeeResponse_avatar'
+        code:
+          type: string
+          description: External Id
+          nullable: true
+        teamId:
+          type: string
+          description: Team identifier
+          nullable: true
+      example:
+        firstName: firstName
+        lastName: lastName
+        role: role
+        code: code
+        phone: phone
+        jobTitle: jobTitle
+        teamId: teamId
+        id: id
+        avatar:
+          url: url
+        email: email
+    AccountsResponse_accounts:
+      required:
+      - accountCategoryId
+      - hidden
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the account
+        accountNumber:
+          type: string
+          description: Account number
+        taxCodeId:
+          type: string
+          description: unique Tax Code ID
+        name:
+          type: string
+          description: Description of this account
+        accountCategoryId:
+          type: string
+          description: unique Category ID of the account
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+      example:
+        hidden: true
+        name: name
+        id: id
+        accountNumber: accountNumber
+        taxCodeId: taxCodeId
+        accountCategoryId: accountCategoryId
+    AccountGroupsResponse_accountGroups:
+      required:
+      - hidden
+      - id
+      - name
+      - typeKey
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the account group
+        name:
+          type: string
+          description: Description of the account group
+        typeKey:
+          type: string
+          description: Type key of the account group
+          nullable: false
+          enum:
+          - entertainment
+          - equipment_and_hardware
+          - marketing_and_advertising
+          - meals_and_drinks
+          - office_expenses
+          - phone_and_internet
+          - services_and_consultancy
+          - software
+          - supplies
+          - travel
+          - other
+          - no_suitable_category
+        hidden:
+          type: boolean
+          description: Is the account hidden/archived for the user
+      example:
+        typeKey: entertainment
+        hidden: true
+        name: name
+        id: id
+    TeamsResponse_teams:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the department
+        name:
+          type: string
+          description: Name of the department
+        code:
+          type: string
+          description: Code of the department
+          nullable: true
+        employees:
+          type: array
+          description: Team employee
+          items:
+            $ref: '#/components/schemas/EmployeesResponse_employees'
+        reviewers:
+          type: array
+          description: Team reviewers
+          items:
+            $ref: '#/components/schemas/EmployeesResponse_employees'
+      example:
+        code: code
+        name: name
+        id: id
+        employees:
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+        - firstName: firstName
+          lastName: lastName
+          role: role
+          code: code
+          phone: phone
+          jobTitle: jobTitle
+          teamId: teamId
+          id: id
+          avatar:
+            url: url
+          email: email
+        reviewers:
+        - null
+        - null
+    TaxCodesResponse_taxCodes:
+      required:
+      - enabled
+      - id
+      - name
+      - rate
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique UUID identifier of the tax code.
+        name:
+          type: string
+          description: The name of the tax.
+        code:
+          type: string
+          description: The short code of the tax.
+          nullable: true
+        rate:
+          type: number
+          description: This is the rate of the tax code.
+        type:
+          type: string
+          description: This is the type of the tax code. Can be "normal" or "reverse".
+          nullable: false
+          default: normal
+          enum:
+          - NORMAL
+          - REVERSE
+        ingoingTaxAccount:
+          type: string
+          description: This is the ingoing account related to the tax codes.
+        outgoingTaxAccount:
+          type: string
+          description: This is the outgoing account related to the tax codes.
+        enabled:
+          type: boolean
+          description: This value is true if the tax code is not hidden.
+        createdAt:
+          type: string
+          description: Date and time this record was created in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        updatedAt:
+          type: string
+          description: Date and time this record was last updated in the pleo system
+            in the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+        deletedAt:
+          type: string
+          description: Date and time this record was deleted in the pleo system in
+            the format YYYY-MM-DDTHH:mi:ss.SSSZ
+          format: date-time
+          nullable: true
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        deletedAt: 2000-01-23T04:56:07.000+00:00
+        code: code
+        rate: 0.80082819046101150206595775671303272247314453125
+        ingoingTaxAccount: ingoingTaxAccount
+        name: name
+        id: id
+        outgoingTaxAccount: outgoingTaxAccount
+        type: normal
+        enabled: true
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    BearerToken:
+      type: http
+      description: Open API Bearer token
+      scheme: bearer
+  links: {}
+  callbacks: {}
+x-readme:
+  proxy-enabled: false

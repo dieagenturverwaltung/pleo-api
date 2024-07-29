@@ -3,7 +3,6 @@ package pleo_api
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -40,35 +39,30 @@ type TokenInfo struct {
 	Jti       string `json:"jti"`
 }
 
-func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*TokenInfo, string, error) {
+func (client *Client) TokenInfo(ctx context.Context, token *oauth2.Token) (*TokenInfo, error) {
 	introspectUrl := client.config.Endpoint.TokenURL + "/introspect"
 	var form = make(url.Values)
 	form.Set("token", token.AccessToken)
 
 	request, err := http.NewRequest("POST", introspectUrl, strings.NewReader(form.Encode()))
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	request.SetBasicAuth(url.QueryEscape(client.config.ClientID), url.QueryEscape(client.config.ClientSecret))
 	response, err := http.DefaultClient.Do(request.WithContext(ctx))
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	defer response.Body.Close()
 
-	all, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, "", err
-	}
-
 	var info TokenInfo
-	err = json.Unmarshal(all, &info)
+	err = json.NewDecoder(response.Body).Decode(&info)
 	if err != nil {
-		return nil, string(all), err
+		return nil, err
 	}
 
-	return &info, string(all), nil
+	return &info, nil
 }
