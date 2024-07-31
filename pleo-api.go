@@ -1,6 +1,9 @@
 package pleo_api
 
-import "golang.org/x/oauth2"
+import (
+	"github.com/dieagenturverwaltung/pleo-api/shared"
+	"golang.org/x/oauth2"
+)
 
 const (
 	tokenURL = "https://auth.pleo.io/oauth/token"
@@ -8,26 +11,24 @@ const (
 
 	stagingTokenURL = "https://auth.staging.pleo.io/oauth/token"
 	stagingAuthURL  = "https://auth.staging.pleo.io/oauth/authorize"
-
-	stagingBaseURL = "https://openapi.staging.pleo.io/v1"
-	baseURL        = "https://openapi.pleo.io/v1"
 )
 
 type Client struct {
-	config  *oauth2.Config
-	baseURL string
+	config               *oauth2.Config
+	openApiConfiguration shared.Configuration
 }
 
 func New(clientID, clientSecret string, staging bool, scopes ...string) *Client {
 	var endpoint oauth2.Endpoint
-	baseUrl := baseURL
+	var openApiConfiguration shared.Configuration
 	if staging {
-		baseUrl = stagingBaseURL
+		openApiConfiguration = *shared.NewStagingConfiguration()
 		endpoint = oauth2.Endpoint{
 			AuthURL:  stagingAuthURL,
 			TokenURL: stagingTokenURL,
 		}
 	} else {
+		openApiConfiguration = *shared.NewConfiguration()
 		endpoint = oauth2.Endpoint{
 			AuthURL:  authURL,
 			TokenURL: tokenURL,
@@ -42,7 +43,7 @@ func New(clientID, clientSecret string, staging bool, scopes ...string) *Client 
 	}
 
 	return &Client{
-		config:  conf,
-		baseURL: baseUrl,
+		config:               conf,
+		openApiConfiguration: openApiConfiguration,
 	}
 }

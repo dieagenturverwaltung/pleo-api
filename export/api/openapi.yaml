@@ -1,0 +1,4322 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: apiteam@pleo.io
+  description: Export OpenAPI definitions
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://pleo.io/terms/
+  title: Export API
+  version: 20.0.0
+servers:
+- description: Production server
+  url: https://external.pleo.io
+- description: Staging server
+  url: https://external.staging.pleo.io
+security:
+- bearerAuth: []
+tags:
+- name: health
+- name: export-items
+- name: export-jobs
+- name: admin
+paths:
+  /v0/export-items:
+    get:
+      description: Fetch a list of export items that have been marked for export for
+        a given job. The data for these accounting entries are transformed accordingly
+        for export purposes.
+      operationId: getExportItems
+      parameters:
+      - description: Job ID which the accounting entries are linked to
+        explode: true
+        in: query
+        name: job_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportItem'
+          description: default response
+      summary: Get Export Items
+      tags:
+      - Export Items (v0)
+  /v0/export-job-events:
+    post:
+      description: "\n            The Export Job Events are used to move the Export\
+        \ Job through the export lifecycle, \n            updating the status and\
+        \ results of the export.\n            This endpoint is used to update the\
+        \ status and failure reasons (if failed) of an export job, \n            i.e.\
+        \ start a job, mark a job as failed, complete a job, cancel a job, etc.\n\n\
+        \            Events:\n\n            - started: Used to start processing an\
+        \ export job. This allows the integration \n                    service to\
+        \ start processing the export job items.\n            - failed: Use this to\
+        \ mark a job as failed when an irrecoverable error happens, \n           \
+        \         and this could be while processing the export job items.\n     \
+        \       - completed: Used to indicate that all the export job items have been\
+        \ successfully processed.\n            - completed_with_errors: Used when\
+        \ all the export job items have been processed, but some of then failed.\n\
+        \            - canceled: Used to indicate if the integration service is unable,\
+        \ for any reason, \n                    to continue processing the export\
+        \ job."
+      operationId: createExportJobEvent
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateExportJobEvent'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8: {}
+          description: default response
+      summary: Create an Export Job Event
+      tags:
+      - Export API (v0)
+  /v0/export-jobs:
+    get:
+      description: Fetch a list of export jobs
+      operationId: getExportJobsList
+      parameters:
+      - description: Fetch a list of jobs for a given company
+        explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: Fetch a list of jobs for a specific status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - completed
+          - completed_with_errors
+          nullable: true
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportJob'
+          description: default response
+      summary: Get a list of Export Jobs
+      tags:
+      - Export API (v0)
+    post:
+      operationId: createExportJob
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateExportJob'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseExportJob'
+          description: default response
+      summary: Create a new export job
+      tags:
+      - Export API (v0)
+  /v0/export-jobs/{jobId}:
+    get:
+      description: Retrieve an export job for a given export job ID
+      operationId: getExportJobById
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID to fetch
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseExportJob'
+          description: default response
+      summary: Get an Export Job
+      tags:
+      - Export API (v0)
+  /v0/export-jobs/{jobId}/items:
+    get:
+      description: Fetch a list of export job items
+      operationId: getExportJobItems
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID
+          format: uuid
+          type: string
+        style: simple
+      - description: Filter by the export job item status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - successful
+          - abandoned
+          nullable: true
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportJobItem'
+          description: default response
+      summary: Get Export Job Items
+      tags:
+      - Export API (v0)
+    put:
+      description: Update the status and other attributes of the export job items
+        in batches of 100. This API only supports updating up to 100 items.
+      operationId: updateExportJobItems
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              items:
+                $ref: '#/components/schemas/UpdateExportJobItem'
+              type: array
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ExportJobItemUpdate'
+          description: default response
+      summary: Update Export Job Items
+      tags:
+      - Export API (v0)
+  /v1/export-items:
+    get:
+      description: Fetch a list of export items that have been marked for export for
+        a given job. The data for these accounting entries are transformed accordingly
+        for export purposes.
+      operationId: getExportItemsV1
+      parameters:
+      - description: Job ID which the accounting entries are linked to
+        explode: true
+        in: query
+        name: job_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportItemV1'
+          description: default response
+      summary: Get Export Items
+      tags:
+      - Export Items (v1)
+  /v1/export-job-events:
+    post:
+      description: "\n            The Export Job Events are used to move the Export\
+        \ Job through the export lifecycle, \n            updating the status and\
+        \ results of the export.\n            This endpoint is used to update the\
+        \ status and failure reasons (if failed) of an export job, \n            i.e.\
+        \ start a job, mark a job as failed, complete a job, cancel a job, etc.\n\n\
+        \            Events:\n\n            - started: Used to start processing an\
+        \ export job. This allows the integration \n                    service to\
+        \ start processing the export job items.\n            - failed: Use this to\
+        \ mark a job as failed when an irrecoverable error happens, \n           \
+        \         and this could be while processing the export job items.\n     \
+        \       - completed: Used to indicate that all the export job items have been\
+        \ successfully processed.\n            - completed_with_errors: Used when\
+        \ all the export job items have been processed, but some of then failed.\n\
+        \            - canceled: Used to indicate if the integration service is unable,\
+        \ for any reason, \n                    to continue processing the export\
+        \ job."
+      operationId: createExportJobEventV1
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateExportJobEvent'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8: {}
+          description: default response
+      summary: Create an Export Job Event
+      tags:
+      - Export API (v1)
+  /v1/export-jobs:
+    get:
+      description: Fetch a list of export jobs
+      operationId: getExportJobsListV1
+      parameters:
+      - description: Fetch a list of jobs for a given company
+        explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: Fetch a list of jobs for a specific status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - completed
+          - completed_with_errors
+          nullable: true
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportJob'
+          description: default response
+      summary: Get a list of Export Jobs
+      tags:
+      - Export API (v1)
+    post:
+      operationId: createExportJobV1
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateExportJob'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseExportJob'
+          description: default response
+      summary: Create a new export job
+      tags:
+      - Export API (v1)
+  /v1/export-jobs/{jobId}:
+    get:
+      description: Retrieve an export job for a given export job ID
+      operationId: getExportJobByIdV1
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID to fetch
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseExportJob'
+          description: default response
+      summary: Get an Export Job
+      tags:
+      - Export API (v1)
+  /v1/export-jobs/{jobId}/items:
+    get:
+      description: Fetch a list of export job items
+      operationId: getExportJobItemsV1
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID
+          format: uuid
+          type: string
+        style: simple
+      - description: Filter by the export job item status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - successful
+          - abandoned
+          nullable: true
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseExportJobItem'
+          description: default response
+      summary: Get Export Job Items
+      tags:
+      - Export API (v1)
+    put:
+      description: Update the status and other attributes of the export job items
+        in batches of 100. This API only supports updating up to 100 items.
+      operationId: updateExportJobItemsV1
+      parameters:
+      - explode: false
+        in: path
+        name: jobId
+        required: true
+        schema:
+          description: Export Job ID
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              items:
+                $ref: '#/components/schemas/UpdateExportJobItem'
+              type: array
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ExportJobItemUpdate'
+          description: default response
+      summary: Update Export Job Items
+      tags:
+      - Export API (v1)
+components:
+  schemas:
+    Account:
+      description: "This is the GL account this accounting entry line is allocated\
+        \ to. The account code or the account identifier be present if an account\
+        \ has been allocated, or both."
+      example:
+        identifier: identifier
+        code: code
+      nullable: true
+      properties:
+        code:
+          description: The account code or number
+          nullable: true
+          type: string
+        identifier:
+          description: The internal account identifier in the accounting system
+          nullable: true
+          type: string
+      type: object
+    AccountV1:
+      description: "This is the GL account this accounting entry line is allocated\
+        \ to. The account code or the account identifier be present if an account\
+        \ has been allocated, or both."
+      example:
+        identifier: identifier
+        code: code
+        name: Meals and Entertainment
+        id: 00000000-0000-0000-0000-000000000000
+      nullable: true
+      properties:
+        code:
+          description: The account code or number
+          nullable: true
+          type: string
+        id:
+          description: This is the Pleo internal identifier of the account
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        identifier:
+          description: The internal account identifier in the accounting system
+          nullable: true
+          type: string
+        name:
+          description: This is the name of the account as set on the Pleo UI
+          example: Meals and Entertainment
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    CreateExportJob:
+      example:
+        companyId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        isInteractive: true
+        employeeId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        accountingEntryIds:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        accountingEntryIds:
+          description: List of accounting entry IDs the job is being created for
+          items:
+            description: List of accounting entry IDs the job is being created for
+            format: uuid
+            type: string
+          type: array
+        companyId:
+          description: Company ID the export job is being created for
+          format: uuid
+          type: string
+        employeeId:
+          description: This is the Pleo unique identifier of the user that initiated
+            the export job
+          format: uuid
+          nullable: true
+          type: string
+        isInteractive:
+          default: true
+          description: "Non-Interactive jobs are jobs that have not been initiated\
+            \ by a user. These jobs are usually triggered in the background and required\
+            \ no user interaction. Whereas interactive jobs are the opposite. This\
+            \ flag should be set to true if the Job is interactive and if not set\
+            \ to false. By default this is set to true, i.e. by default jobs are deemed\
+            \ to be interactive, i.e. initiated by a user."
+          nullable: true
+          type: boolean
+      required:
+      - accountingEntryIds
+      - companyId
+      type: object
+    CreateExportJobEvent:
+      example:
+        jobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        failureReason: failureReason
+        failureReasonType: invalid_configuration
+        event: started
+      properties:
+        event:
+          enum:
+          - started
+          - failed
+          - completed
+          - completed_with_errors
+          type: string
+        failureReason:
+          description: Reason why the job failed in the case of a failure
+          type: string
+        failureReasonType:
+          description: The classification for the failure from a list of described
+            failure reason types
+          enum:
+          - invalid_configuration
+          - missing_configuration
+          - authentication_failure
+          - accounting_system_authentication_failure
+          - pleo_rate_limit
+          - accounting_system_rate_limit
+          - service_unreachable
+          - accounting_system_unreachable
+          - validation_failure
+          - authorization_failure
+          - integration_unusable
+          - job_expired
+          - service_timeout
+          - accounting_system_timeout
+          - canceled_by_user
+          type: string
+        jobId:
+          description: Identifier of the job the event is to be processed for
+          format: uuid
+          type: string
+      required:
+      - event
+      - jobId
+      type: object
+    CursorPageCurrentRequestInfo:
+      example:
+        sortingKeys:
+        - sortingKeys
+        - sortingKeys
+        sortingOrder:
+        - null
+        - null
+        offset: 1
+        before: before
+        limit: 6
+        after: after
+        parameters:
+          key:
+          - parameters
+          - parameters
+      properties:
+        after:
+          type: string
+        before:
+          type: string
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int64
+          type: integer
+        parameters:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        sortingKeys:
+          items:
+            type: string
+          type: array
+        sortingOrder:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+      required:
+      - parameters
+      type: object
+    CursorPageInfo:
+      example:
+        currentRequestPagination:
+          sortingKeys:
+          - sortingKeys
+          - sortingKeys
+          sortingOrder:
+          - null
+          - null
+          offset: 1
+          before: before
+          limit: 6
+          after: after
+          parameters:
+            key:
+            - parameters
+            - parameters
+        total: 5
+        hasNextPage: true
+        hasPreviousPage: true
+        endCursor: endCursor
+        startCursor: startCursor
+      properties:
+        currentRequestPagination:
+          $ref: '#/components/schemas/CursorPageCurrentRequestInfo'
+        endCursor:
+          type: string
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+        startCursor:
+          type: string
+        total:
+          format: int64
+          type: integer
+      required:
+      - currentRequestPagination
+      - hasNextPage
+      - hasPreviousPage
+      type: object
+    CursorPaginatedResponseExportItem:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 1
+            before: before
+            limit: 6
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 5
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - date: 2020-01-01T00:00:00Z
+          note: note
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          metadata:
+            invoiceInformation:
+              dueDate: 2000-01-23T04:56:07.000+00:00
+              invoiceNumber: invoiceNumber
+              invoiceDate: 2000-01-23T04:56:07.000+00:00
+              paymentDate: 2000-01-23T04:56:07.000+00:00
+              supplierBankAccount:
+                bankCode: bankCode
+                country: DK
+                iban: iban
+                bankName: bankName
+                accountNumber: accountNumber
+                bic: bic
+              status: pending_approval
+            attendees:
+            - attendees
+            - attendees
+            reconciliationId: reconciliationId
+          _links:
+            web:
+              exportItem: http://example.com
+            mobile:
+              exportItem: http://example.com
+            api:
+              exportItem: http://example.com
+          accountingEntryId: 00000000-0000-0000-0000-000000000000
+          teamCode: teamCode
+          type: card_purchase
+          accountingEntryLines:
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              groupCode: groupCode
+            - code: code
+              groupCode: groupCode
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              groupCode: groupCode
+            - code: code
+              groupCode: groupCode
+          companyId: 00000000-0000-0000-0000-000000000000
+          supplier:
+            country: DK
+            identifier: identifier
+            name: GOOGLE*ADS8693645259
+            taxIdentifier: taxIdentifier
+            categoryCode: "5999"
+            account: account
+          files:
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          user:
+            code: code
+            name: John Doe
+        - date: 2020-01-01T00:00:00Z
+          note: note
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          metadata:
+            invoiceInformation:
+              dueDate: 2000-01-23T04:56:07.000+00:00
+              invoiceNumber: invoiceNumber
+              invoiceDate: 2000-01-23T04:56:07.000+00:00
+              paymentDate: 2000-01-23T04:56:07.000+00:00
+              supplierBankAccount:
+                bankCode: bankCode
+                country: DK
+                iban: iban
+                bankName: bankName
+                accountNumber: accountNumber
+                bic: bic
+              status: pending_approval
+            attendees:
+            - attendees
+            - attendees
+            reconciliationId: reconciliationId
+          _links:
+            web:
+              exportItem: http://example.com
+            mobile:
+              exportItem: http://example.com
+            api:
+              exportItem: http://example.com
+          accountingEntryId: 00000000-0000-0000-0000-000000000000
+          teamCode: teamCode
+          type: card_purchase
+          accountingEntryLines:
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              groupCode: groupCode
+            - code: code
+              groupCode: groupCode
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              groupCode: groupCode
+            - code: code
+              groupCode: groupCode
+          companyId: 00000000-0000-0000-0000-000000000000
+          supplier:
+            country: DK
+            identifier: identifier
+            name: GOOGLE*ADS8693645259
+            taxIdentifier: taxIdentifier
+            categoryCode: "5999"
+            account: account
+          files:
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          user:
+            code: code
+            name: John Doe
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ExportItem'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    CursorPaginatedResponseExportItemV1:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 1
+            before: before
+            limit: 6
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 5
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - date: 2020-01-01T00:00:00Z
+          additionalInformation:
+            invoiceInformation:
+              dueDate: 2000-01-23T04:56:07.000+00:00
+              invoiceNumber: invoiceNumber
+              invoiceDate: 2000-01-23T04:56:07.000+00:00
+              paymentDate: 2000-01-23T04:56:07.000+00:00
+              supplierBankAccount:
+                bankCode: bankCode
+                country: DK
+                iban: iban
+                bankName: bankName
+                accountNumber: accountNumber
+                bic: bic
+              status: pending_approval
+            reconciledEntries:
+            - reconciledEntries
+            - reconciledEntries
+            attendees:
+            - attendees
+            - attendees
+            reconciliationId: reconciliationId
+          note: note
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          _links:
+            web:
+              exportItem: http://example.com
+            mobile:
+              exportItem: http://example.com
+            api:
+              exportItem: http://example.com
+          accountingEntryId: 00000000-0000-0000-0000-000000000000
+          teamCode: teamCode
+          team:
+            code: code
+            name: Marketing
+            id: 00000000-0000-0000-0000-000000000000
+          type: card_purchase
+          accountingEntryLines:
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              id: 00000000-0000-0000-0000-000000000000
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+              name: Meals and Entertainment
+              id: 00000000-0000-0000-0000-000000000000
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              id: 00000000-0000-0000-0000-000000000000
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+              name: Meals and Entertainment
+              id: 00000000-0000-0000-0000-000000000000
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+          companyId: 00000000-0000-0000-0000-000000000000
+          supplier:
+            country: DK
+            code: code
+            name: GOOGLE*ADS8693645259
+            taxIdentifier: taxIdentifier
+            categoryCode: "5999"
+            account: account
+          files:
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          user:
+            code: code
+            name: John Doe
+            id: 00000000-0000-0000-0000-000000000000
+        - date: 2020-01-01T00:00:00Z
+          additionalInformation:
+            invoiceInformation:
+              dueDate: 2000-01-23T04:56:07.000+00:00
+              invoiceNumber: invoiceNumber
+              invoiceDate: 2000-01-23T04:56:07.000+00:00
+              paymentDate: 2000-01-23T04:56:07.000+00:00
+              supplierBankAccount:
+                bankCode: bankCode
+                country: DK
+                iban: iban
+                bankName: bankName
+                accountNumber: accountNumber
+                bic: bic
+              status: pending_approval
+            reconciledEntries:
+            - reconciledEntries
+            - reconciledEntries
+            attendees:
+            - attendees
+            - attendees
+            reconciliationId: reconciliationId
+          note: note
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          _links:
+            web:
+              exportItem: http://example.com
+            mobile:
+              exportItem: http://example.com
+            api:
+              exportItem: http://example.com
+          accountingEntryId: 00000000-0000-0000-0000-000000000000
+          teamCode: teamCode
+          team:
+            code: code
+            name: Marketing
+            id: 00000000-0000-0000-0000-000000000000
+          type: card_purchase
+          accountingEntryLines:
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              id: 00000000-0000-0000-0000-000000000000
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+              name: Meals and Entertainment
+              id: 00000000-0000-0000-0000-000000000000
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+          - netAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tax:
+              amount:
+                inSupplierCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+                inWalletCurrency:
+                  currency: UNDEFINED
+                  value: 0.8008281904610115
+              code: code
+              rate: 0.2
+              id: 00000000-0000-0000-0000-000000000000
+              type: inclusive
+            account:
+              identifier: identifier
+              code: code
+              name: Meals and Entertainment
+              id: 00000000-0000-0000-0000-000000000000
+            accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+            lineAmount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            tags:
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+            - code: code
+              id: 00000000-0000-0000-0000-000000000000
+              groupCode: groupCode
+          companyId: 00000000-0000-0000-0000-000000000000
+          supplier:
+            country: DK
+            code: code
+            name: GOOGLE*ADS8693645259
+            taxIdentifier: taxIdentifier
+            categoryCode: "5999"
+            account: account
+          files:
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          - size: 2084
+            type: application/pdf
+            url: https://file.url
+          user:
+            code: code
+            name: John Doe
+            id: 00000000-0000-0000-0000-000000000000
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ExportItemV1'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    CursorPaginatedResponseExportJob:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 1
+            before: before
+            limit: 6
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 5
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - completedAt: 2000-01-23T04:56:07.000+00:00
+          lastUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          isInteractive: true
+          startedAt: 2000-01-23T04:56:07.000+00:00
+          expiresIn: 0
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          expiredAt: 2000-01-23T04:56:07.000+00:00
+          companyId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          createdBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          numberOfItems: 6
+          failureReason: failureReason
+          failureReasonType: invalid_configuration
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        - completedAt: 2000-01-23T04:56:07.000+00:00
+          lastUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          isInteractive: true
+          startedAt: 2000-01-23T04:56:07.000+00:00
+          expiresIn: 0
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          expiredAt: 2000-01-23T04:56:07.000+00:00
+          companyId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          createdBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          numberOfItems: 6
+          failureReason: failureReason
+          failureReasonType: invalid_configuration
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ExportJob'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    CursorPaginatedResponseExportJobItem:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 1
+            before: before
+            limit: 6
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 5
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - externalUrl: externalUrl
+          accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          failureReason: failureReason
+          failureReasonType: receipt_upload_failure
+          exportedAt: 2000-01-23T04:56:07.000+00:00
+          externalId: externalId
+          exportJobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        - externalUrl: externalUrl
+          accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          failureReason: failureReason
+          failureReasonType: receipt_upload_failure
+          exportedAt: 2000-01-23T04:56:07.000+00:00
+          externalId: externalId
+          exportJobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ExportJobItem'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    DataResponseExportJob:
+      example:
+        data:
+          completedAt: 2000-01-23T04:56:07.000+00:00
+          lastUpdatedAt: 2000-01-23T04:56:07.000+00:00
+          isInteractive: true
+          startedAt: 2000-01-23T04:56:07.000+00:00
+          expiresIn: 0
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          expiredAt: 2000-01-23T04:56:07.000+00:00
+          companyId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          createdBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          numberOfItems: 6
+          failureReason: failureReason
+          failureReasonType: invalid_configuration
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+      properties:
+        data:
+          $ref: '#/components/schemas/ExportJob'
+      required:
+      - data
+      type: object
+    ExportItem:
+      example:
+        date: 2020-01-01T00:00:00Z
+        note: note
+        amount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        metadata:
+          invoiceInformation:
+            dueDate: 2000-01-23T04:56:07.000+00:00
+            invoiceNumber: invoiceNumber
+            invoiceDate: 2000-01-23T04:56:07.000+00:00
+            paymentDate: 2000-01-23T04:56:07.000+00:00
+            supplierBankAccount:
+              bankCode: bankCode
+              country: DK
+              iban: iban
+              bankName: bankName
+              accountNumber: accountNumber
+              bic: bic
+            status: pending_approval
+          attendees:
+          - attendees
+          - attendees
+          reconciliationId: reconciliationId
+        _links:
+          web:
+            exportItem: http://example.com
+          mobile:
+            exportItem: http://example.com
+          api:
+            exportItem: http://example.com
+        accountingEntryId: 00000000-0000-0000-0000-000000000000
+        teamCode: teamCode
+        type: card_purchase
+        accountingEntryLines:
+        - netAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tax:
+            amount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            code: code
+            rate: 0.2
+            type: inclusive
+          account:
+            identifier: identifier
+            code: code
+          accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+          lineAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tags:
+          - code: code
+            groupCode: groupCode
+          - code: code
+            groupCode: groupCode
+        - netAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tax:
+            amount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            code: code
+            rate: 0.2
+            type: inclusive
+          account:
+            identifier: identifier
+            code: code
+          accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+          lineAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tags:
+          - code: code
+            groupCode: groupCode
+          - code: code
+            groupCode: groupCode
+        companyId: 00000000-0000-0000-0000-000000000000
+        supplier:
+          country: DK
+          identifier: identifier
+          name: GOOGLE*ADS8693645259
+          taxIdentifier: taxIdentifier
+          categoryCode: "5999"
+          account: account
+        files:
+        - size: 2084
+          type: application/pdf
+          url: https://file.url
+        - size: 2084
+          type: application/pdf
+          url: https://file.url
+        user:
+          code: code
+          name: John Doe
+      properties:
+        _links:
+          $ref: '#/components/schemas/LinksResponse'
+        accountingEntryId:
+          description: This is the Pleo internal identifier of the export item
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        accountingEntryLines:
+          description: "Accounting entry broken down in entry lines. There will always\
+            \ be an accounting entry line. If the accounting entry has been split\
+            \ into separate lines, then each line would represent the details of that\
+            \ accounting entry line, else there would only be one line present, representing\
+            \ the whole entry."
+          items:
+            $ref: '#/components/schemas/ExportItemLine'
+          type: array
+        amount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        companyId:
+          description: Pleo company identifier this export item belongs to
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        date:
+          description: Date the accounting entry should be bookkept
+          example: 2020-01-01T00:00:00Z
+          format: date-time
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        files:
+          description: Files that have been attached to this accounting entry
+          items:
+            $ref: '#/components/schemas/ExportItemFile'
+          nullable: true
+          type: array
+        metadata:
+          $ref: '#/components/schemas/ExportItemMetadata'
+        note:
+          description: Additional comments potentially describing the accounting entry
+          nullable: true
+          type: string
+        supplier:
+          $ref: '#/components/schemas/Supplier'
+        teamCode:
+          description: Team code is an identifier assigned to an expense to categorize
+            it or associate it with a specific team
+          nullable: true
+          type: string
+        type:
+          description: This is the Pleo internal identifier of the accounting entry
+            this export item is associated with
+          enum:
+          - card_purchase
+          - card_invoice
+          - out_of_pocket
+          - mileage
+          - per_diem
+          - external_reimbursement
+          - direct_reimbursement
+          - invoice
+          - invoice_payment
+          - chargeback
+          - refund
+          - cashback
+          - atm_withdrawal
+          - wallet_topup
+          - wallet_unload
+          type: string
+        user:
+          $ref: '#/components/schemas/ExportItemUser'
+      required:
+      - _links
+      - accountingEntryId
+      - accountingEntryLines
+      - amount
+      - companyId
+      - date
+      - metadata
+      - type
+      - user
+      type: object
+    ExportItemAdditionalInformationV1:
+      description: Additional information applicable to this accounting entry
+      example:
+        invoiceInformation:
+          dueDate: 2000-01-23T04:56:07.000+00:00
+          invoiceNumber: invoiceNumber
+          invoiceDate: 2000-01-23T04:56:07.000+00:00
+          paymentDate: 2000-01-23T04:56:07.000+00:00
+          supplierBankAccount:
+            bankCode: bankCode
+            country: DK
+            iban: iban
+            bankName: bankName
+            accountNumber: accountNumber
+            bic: bic
+          status: pending_approval
+        reconciledEntries:
+        - reconciledEntries
+        - reconciledEntries
+        attendees:
+        - attendees
+        - attendees
+        reconciliationId: reconciliationId
+      properties:
+        attendees:
+          description: "Used to represent attendance involvement or participants at\
+            \ the time of the spend. E.g. if an employee took clients to dinner, this\
+            \ would be used to capture who was present at the dinner."
+          items:
+            description: "Used to represent attendance involvement or participants\
+              \ at the time of the spend. E.g. if an employee took clients to dinner,\
+              \ this would be used to capture who was present at the dinner."
+            nullable: true
+            type: string
+          nullable: true
+          type: array
+        invoiceInformation:
+          $ref: '#/components/schemas/InvoiceInformationV1'
+        reconciledEntries:
+          description: "A list of reconciliation IDs that were settled by this accounting\
+            \ entry. E.g. if this is a payment, then this would be the list of reconciliation\
+            \ IDs that for invoices were settled by this payment. If this is a reimbursement,\
+            \ it would be a list of the reconciliation IDs of the pocket expenses\
+            \ that the reimbursement settles."
+          items:
+            description: "A list of reconciliation IDs that were settled by this accounting\
+              \ entry. E.g. if this is a payment, then this would be the list of reconciliation\
+              \ IDs that for invoices were settled by this payment. If this is a reimbursement,\
+              \ it would be a list of the reconciliation IDs of the pocket expenses\
+              \ that the reimbursement settles."
+            nullable: true
+            type: string
+          nullable: true
+          type: array
+          uniqueItems: true
+        reconciliationId:
+          description: This is an identifier used to reconcile between Pleo and the
+            accounting system. Also known in Pleo as the book ID.
+          type: string
+      required:
+      - reconciliationId
+      type: object
+    ExportItemAmount:
+      description: Tax amount
+      example:
+        inSupplierCurrency:
+          currency: UNDEFINED
+          value: 0.8008281904610115
+        inWalletCurrency:
+          currency: UNDEFINED
+          value: 0.8008281904610115
+      properties:
+        inSupplierCurrency:
+          $ref: '#/components/schemas/MoneyModel'
+        inWalletCurrency:
+          $ref: '#/components/schemas/MoneyModel'
+      required:
+      - inSupplierCurrency
+      - inWalletCurrency
+      type: object
+    ExportItemFile:
+      description: Files that have been attached to this accounting entry
+      example:
+        size: 2084
+        type: application/pdf
+        url: https://file.url
+      nullable: true
+      properties:
+        size:
+          description: Size of the file in bytes
+          example: 2084
+          format: int32
+          type: integer
+        type:
+          description: "Type of file, usually represented similar to mime type"
+          example: application/pdf
+          type: string
+        url:
+          description: URL to retrieve the file attachment from. This URL is active
+            for a limited time (24 Hours) from the time the export item is fetched.
+          example: https://file.url
+          type: string
+      required:
+      - size
+      - type
+      - url
+      type: object
+    ExportItemLine:
+      description: "Accounting entry broken down in entry lines. There will always\
+        \ be an accounting entry line. If the accounting entry has been split into\
+        \ separate lines, then each line would represent the details of that accounting\
+        \ entry line, else there would only be one line present, representing the\
+        \ whole entry."
+      example:
+        netAmount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        tax:
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          code: code
+          rate: 0.2
+          type: inclusive
+        account:
+          identifier: identifier
+          code: code
+        accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+        lineAmount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        tags:
+        - code: code
+          groupCode: groupCode
+        - code: code
+          groupCode: groupCode
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        accountingEntryLineId:
+          description: This is the Pleo internal identifier of this accounting entry
+            line
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        lineAmount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        netAmount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        tags:
+          description: "Tags are used to appropriate funds to specific projects, cost\
+            \ centers, departments, etc. This is what is known as \"tags\" in Pleo."
+          items:
+            $ref: '#/components/schemas/Tag'
+          nullable: true
+          type: array
+        tax:
+          $ref: '#/components/schemas/Tax'
+      required:
+      - accountingEntryLineId
+      - lineAmount
+      - netAmount
+      type: object
+    ExportItemLineV1:
+      description: "Accounting entry broken down in entry lines. There will always\
+        \ be an accounting entry line. If the accounting entry has been split into\
+        \ separate lines, then each line would represent the details of that accounting\
+        \ entry line, else there would only be one line present, representing the\
+        \ whole entry."
+      example:
+        netAmount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        tax:
+          amount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          code: code
+          rate: 0.2
+          id: 00000000-0000-0000-0000-000000000000
+          type: inclusive
+        account:
+          identifier: identifier
+          code: code
+          name: Meals and Entertainment
+          id: 00000000-0000-0000-0000-000000000000
+        accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+        lineAmount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        tags:
+        - code: code
+          id: 00000000-0000-0000-0000-000000000000
+          groupCode: groupCode
+        - code: code
+          id: 00000000-0000-0000-0000-000000000000
+          groupCode: groupCode
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountV1'
+        accountingEntryLineId:
+          description: This is the Pleo internal identifier of this accounting entry
+            line
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        lineAmount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        netAmount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        tags:
+          description: "Tags are used to appropriate funds to specific projects, cost\
+            \ centers, departments, etc. This is what is known as \"tags\" in Pleo."
+          items:
+            $ref: '#/components/schemas/TagV1'
+          nullable: true
+          type: array
+        tax:
+          $ref: '#/components/schemas/TaxV1'
+      required:
+      - accountingEntryLineId
+      - lineAmount
+      - netAmount
+      type: object
+    ExportItemMetadata:
+      description: Additional metadata applicable to this accounting entry
+      example:
+        invoiceInformation:
+          dueDate: 2000-01-23T04:56:07.000+00:00
+          invoiceNumber: invoiceNumber
+          invoiceDate: 2000-01-23T04:56:07.000+00:00
+          paymentDate: 2000-01-23T04:56:07.000+00:00
+          supplierBankAccount:
+            bankCode: bankCode
+            country: DK
+            iban: iban
+            bankName: bankName
+            accountNumber: accountNumber
+            bic: bic
+          status: pending_approval
+        attendees:
+        - attendees
+        - attendees
+        reconciliationId: reconciliationId
+      properties:
+        attendees:
+          description: "Used to represent attendance involvement or participants at\
+            \ the time of the spend. E.g. if an employee took clients to dinner, this\
+            \ would be used to capture who was present at the dinner."
+          items:
+            description: "Used to represent attendance involvement or participants\
+              \ at the time of the spend. E.g. if an employee took clients to dinner,\
+              \ this would be used to capture who was present at the dinner."
+            nullable: true
+            type: string
+          nullable: true
+          type: array
+        invoiceInformation:
+          $ref: '#/components/schemas/InvoiceInformation'
+        reconciliationId:
+          description: This is an identifier used to reconcile between Pleo and the
+            accounting system. Also known in Pleo as the book ID.
+          type: string
+      required:
+      - reconciliationId
+      type: object
+    ExportItemUser:
+      description: This applies to the person that initiated the spend. This would
+        in most cases be the employee
+      example:
+        code: code
+        name: John Doe
+      properties:
+        code:
+          description: This would usually represent the employee code
+          nullable: true
+          type: string
+        name:
+          description: Full name of the user
+          example: John Doe
+          type: string
+      required:
+      - name
+      type: object
+    ExportItemUserV1:
+      description: This applies to the person that initiated the spend. This would
+        in most cases be the employee
+      example:
+        code: code
+        name: John Doe
+        id: 00000000-0000-0000-0000-000000000000
+      properties:
+        code:
+          description: This would usually represent the employee code
+          nullable: true
+          type: string
+        id:
+          description: This is the Pleo internal identifier of the user
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          nullable: true
+          type: string
+        name:
+          description: Full name of the user
+          example: John Doe
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    ExportItemV1:
+      example:
+        date: 2020-01-01T00:00:00Z
+        additionalInformation:
+          invoiceInformation:
+            dueDate: 2000-01-23T04:56:07.000+00:00
+            invoiceNumber: invoiceNumber
+            invoiceDate: 2000-01-23T04:56:07.000+00:00
+            paymentDate: 2000-01-23T04:56:07.000+00:00
+            supplierBankAccount:
+              bankCode: bankCode
+              country: DK
+              iban: iban
+              bankName: bankName
+              accountNumber: accountNumber
+              bic: bic
+            status: pending_approval
+          reconciledEntries:
+          - reconciledEntries
+          - reconciledEntries
+          attendees:
+          - attendees
+          - attendees
+          reconciliationId: reconciliationId
+        note: note
+        amount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        _links:
+          web:
+            exportItem: http://example.com
+          mobile:
+            exportItem: http://example.com
+          api:
+            exportItem: http://example.com
+        accountingEntryId: 00000000-0000-0000-0000-000000000000
+        teamCode: teamCode
+        team:
+          code: code
+          name: Marketing
+          id: 00000000-0000-0000-0000-000000000000
+        type: card_purchase
+        accountingEntryLines:
+        - netAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tax:
+            amount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            code: code
+            rate: 0.2
+            id: 00000000-0000-0000-0000-000000000000
+            type: inclusive
+          account:
+            identifier: identifier
+            code: code
+            name: Meals and Entertainment
+            id: 00000000-0000-0000-0000-000000000000
+          accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+          lineAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tags:
+          - code: code
+            id: 00000000-0000-0000-0000-000000000000
+            groupCode: groupCode
+          - code: code
+            id: 00000000-0000-0000-0000-000000000000
+            groupCode: groupCode
+        - netAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tax:
+            amount:
+              inSupplierCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+              inWalletCurrency:
+                currency: UNDEFINED
+                value: 0.8008281904610115
+            code: code
+            rate: 0.2
+            id: 00000000-0000-0000-0000-000000000000
+            type: inclusive
+          account:
+            identifier: identifier
+            code: code
+            name: Meals and Entertainment
+            id: 00000000-0000-0000-0000-000000000000
+          accountingEntryLineId: 00000000-0000-0000-0000-000000000000
+          lineAmount:
+            inSupplierCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+            inWalletCurrency:
+              currency: UNDEFINED
+              value: 0.8008281904610115
+          tags:
+          - code: code
+            id: 00000000-0000-0000-0000-000000000000
+            groupCode: groupCode
+          - code: code
+            id: 00000000-0000-0000-0000-000000000000
+            groupCode: groupCode
+        companyId: 00000000-0000-0000-0000-000000000000
+        supplier:
+          country: DK
+          code: code
+          name: GOOGLE*ADS8693645259
+          taxIdentifier: taxIdentifier
+          categoryCode: "5999"
+          account: account
+        files:
+        - size: 2084
+          type: application/pdf
+          url: https://file.url
+        - size: 2084
+          type: application/pdf
+          url: https://file.url
+        user:
+          code: code
+          name: John Doe
+          id: 00000000-0000-0000-0000-000000000000
+      properties:
+        _links:
+          $ref: '#/components/schemas/LinksResponse'
+        accountingEntryId:
+          description: This is the Pleo internal identifier of the export item
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        accountingEntryLines:
+          description: "Accounting entry broken down in entry lines. There will always\
+            \ be an accounting entry line. If the accounting entry has been split\
+            \ into separate lines, then each line would represent the details of that\
+            \ accounting entry line, else there would only be one line present, representing\
+            \ the whole entry."
+          items:
+            $ref: '#/components/schemas/ExportItemLineV1'
+          type: array
+        additionalInformation:
+          $ref: '#/components/schemas/ExportItemAdditionalInformationV1'
+        amount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        companyId:
+          description: Pleo company identifier this export item belongs to
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        date:
+          description: Date the accounting entry should be bookkept
+          example: 2020-01-01T00:00:00Z
+          format: date-time
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        files:
+          description: Files that have been attached to this accounting entry
+          items:
+            $ref: '#/components/schemas/ExportItemFile'
+          nullable: true
+          type: array
+        note:
+          description: Additional comments potentially describing the accounting entry
+          nullable: true
+          type: string
+        supplier:
+          $ref: '#/components/schemas/SupplierV1'
+        team:
+          $ref: '#/components/schemas/Team'
+        teamCode:
+          description: Team code is an identifier assigned to an expense to categorize
+            it or associate it with a specific team
+          nullable: true
+          type: string
+        type:
+          description: This is the Pleo internal identifier of the accounting entry
+            this export item is associated with
+          enum:
+          - card_purchase
+          - card_invoice
+          - out_of_pocket
+          - mileage
+          - per_diem
+          - external_reimbursement
+          - direct_reimbursement
+          - invoice
+          - invoice_payment
+          - chargeback
+          - refund
+          - cashback
+          - atm_withdrawal
+          - wallet_topup
+          - wallet_unload
+          - personal_spend
+          - fee
+          type: string
+        user:
+          $ref: '#/components/schemas/ExportItemUserV1'
+      required:
+      - _links
+      - accountingEntryId
+      - accountingEntryLines
+      - additionalInformation
+      - amount
+      - companyId
+      - date
+      - type
+      - user
+      type: object
+    ExportJob:
+      example:
+        completedAt: 2000-01-23T04:56:07.000+00:00
+        lastUpdatedAt: 2000-01-23T04:56:07.000+00:00
+        isInteractive: true
+        startedAt: 2000-01-23T04:56:07.000+00:00
+        expiresIn: 0
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        expiredAt: 2000-01-23T04:56:07.000+00:00
+        companyId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        createdBy: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        numberOfItems: 6
+        failureReason: failureReason
+        failureReasonType: invalid_configuration
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: pending
+      properties:
+        companyId:
+          description: The Pleo unique identifier of the company the export job belongs
+            to
+          format: uuid
+          type: string
+        completedAt:
+          description: Date and time the job was completed
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        createdAt:
+          description: "Date and time the job was created. When the export button\
+            \ is clicked on the Pleo UI, i.e. an export is initiated by the user,\
+            \ the job is created and the createdAt date is set."
+          format: date-time
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        createdBy:
+          description: This is the Pleo unique identifier of the user that initiated
+            the export job
+          format: uuid
+          nullable: true
+          type: string
+        expiredAt:
+          description: Date and time the job expired
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        expiresIn:
+          description: This is the amount of time in seconds the job will expire relative
+            to the last time an action was taken on the job. The last time an action
+            was taken on the job is reflected by the "lastUpdatedAt" field
+          format: int32
+          type: integer
+        failureReason:
+          description: Reason why the job failed in the case of a failure
+          nullable: true
+          type: string
+        failureReasonType:
+          description: The classification for the failure from a list of described
+            failure reason types
+          enum:
+          - invalid_configuration
+          - missing_configuration
+          - authentication_failure
+          - accounting_system_authentication_failure
+          - pleo_rate_limit
+          - accounting_system_rate_limit
+          - service_unreachable
+          - accounting_system_unreachable
+          - validation_failure
+          - authorization_failure
+          - integration_unusable
+          - job_expired
+          - service_timeout
+          - accounting_system_timeout
+          - canceled_by_user
+          nullable: true
+          type: string
+        id:
+          description: The unique identifier generated by Pleo for the export job
+          format: uuid
+          type: string
+        isInteractive:
+          description: Indicates whether the export job was initiated by a user or
+            by the system
+          type: boolean
+        lastUpdatedAt:
+          description: Last time the job was updated or action on the job was taken
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        numberOfItems:
+          description: Number of accounting entries that were selected for processing
+          type: integer
+        startedAt:
+          description: "Date and time the job was started. When the export-job-events\
+            \ endpoint is called to start the export Job, the startedAt date is set."
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        status:
+          description: Specifies the current execution state of the export job. Some
+            here are the definitions of the values that are supported for this field
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - completed
+          - completed_with_errors
+          type: string
+      required:
+      - companyId
+      - createdAt
+      - expiresIn
+      - id
+      - isInteractive
+      - numberOfItems
+      - status
+      type: object
+    ExportJobItem:
+      example:
+        externalUrl: externalUrl
+        accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        failureReason: failureReason
+        failureReasonType: receipt_upload_failure
+        exportedAt: 2000-01-23T04:56:07.000+00:00
+        externalId: externalId
+        exportJobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        status: pending
+      properties:
+        accountingEntryId:
+          description: The accounting entry identifier being exported
+          format: uuid
+          type: string
+        exportJobId:
+          description: The export job identifier for which this item belongs to
+          format: uuid
+          type: string
+        exportedAt:
+          description: Date and time the item was exported
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        externalId:
+          description: This is an external identifier of the corresponding accounting
+            entry in the accounting system after export
+          nullable: true
+          type: string
+        externalUrl:
+          description: This is the external URL pointing to the accounting entry resource
+            in the accounting system after the export
+          nullable: true
+          type: string
+        failureReason:
+          description: Reason why the export of this item failed in the case of a
+            failure
+          nullable: true
+          type: string
+        failureReasonType:
+          description: The classification for the failure from a list of described
+            failure reason types
+          enum:
+          - receipt_upload_failure
+          - receipt_download_failure
+          - receipt_file_size_limit_exceeded
+          - receipt_conversion_failure
+          - unexpected_failure
+          - invalid_configuration
+          - missing_configuration
+          - accounting_system_authentication_failure
+          - accounting_system_rate_limit
+          - accounting_system_unreachable
+          - validation_failure
+          - accounting_system_validation_failure
+          - authorization_failure
+          - accounting_system_timeout
+          nullable: true
+          type: string
+        status:
+          description: "Status of the export job Item after being processed. The status\
+            \ of the export job item will remain null until the item an attempt has\
+            \ been made to process the export job item or the job is marked as failed\
+            \ or expired, in which case the status will then be abandoned. The status\
+            \ of an export job item that has been processed will either be failed\
+            \ or successful."
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - successful
+          - abandoned
+          type: string
+      required:
+      - accountingEntryId
+      - exportJobId
+      - status
+      type: object
+    ExportJobItemUpdate:
+      example:
+        data:
+        - externalUrl: externalUrl
+          accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          failureReason: failureReason
+          failureReasonType: receipt_upload_failure
+          exportedAt: 2000-01-23T04:56:07.000+00:00
+          externalId: externalId
+          exportJobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        - externalUrl: externalUrl
+          accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          failureReason: failureReason
+          failureReasonType: receipt_upload_failure
+          exportedAt: 2000-01-23T04:56:07.000+00:00
+          externalId: externalId
+          exportJobId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          status: pending
+        errors:
+        - accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          message: message
+          type: ACCOUNTING_ENTRY_DOES_NOT_EXIST
+        - accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          message: message
+          type: ACCOUNTING_ENTRY_DOES_NOT_EXIST
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ExportJobItem'
+          type: array
+        errors:
+          description: "If any errors occurred in updating the export job items, they\
+            \ will be listed here"
+          items:
+            $ref: '#/components/schemas/ExportJobItemUpdateError'
+          type: array
+      required:
+      - data
+      - errors
+      type: object
+    ExportJobItemUpdateError:
+      description: "If any errors occurred in updating the export job items, they\
+        \ will be listed here"
+      example:
+        accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        message: message
+        type: ACCOUNTING_ENTRY_DOES_NOT_EXIST
+      properties:
+        accountingEntryId:
+          description: Accounting entry ID for which this error occurred
+          format: uuid
+          type: string
+        message:
+          description: Descriptive error message
+          type: string
+        type:
+          description: Descriptive error type
+          enum:
+          - ACCOUNTING_ENTRY_DOES_NOT_EXIST
+          - EXPORT_ENTRY_STATUS_UPDATE_FAILED
+          - ACCOUNTING_ENTRY_UPDATE_FAILED
+          type: string
+      required:
+      - accountingEntryId
+      - message
+      - type
+      type: object
+    InvoiceInformation:
+      description: "In the case of an invoice, additional information pertaining to\
+        \ the invoice would be represented here."
+      example:
+        dueDate: 2000-01-23T04:56:07.000+00:00
+        invoiceNumber: invoiceNumber
+        invoiceDate: 2000-01-23T04:56:07.000+00:00
+        paymentDate: 2000-01-23T04:56:07.000+00:00
+        supplierBankAccount:
+          bankCode: bankCode
+          country: DK
+          iban: iban
+          bankName: bankName
+          accountNumber: accountNumber
+          bic: bic
+        status: pending_approval
+      nullable: true
+      properties:
+        dueDate:
+          description: Date the payment is due
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DD
+          type: string
+        invoiceDate:
+          description: Date the invoice was issued
+          format: date-time
+          pattern: YYYY-MM-DD
+          type: string
+        invoiceNumber:
+          description: The invoice number
+          type: string
+        paymentDate:
+          description: Date the invoice was paid if the status is paid
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DD
+          type: string
+        status:
+          description: The invoice status
+          enum:
+          - pending_approval
+          - parsed
+          - preparing
+          - prepared
+          - ready
+          - rejected_by_approver
+          - marked_as_paid
+          - scheduled
+          - payment_in_progress
+          - paid
+          - voided_by_user
+          - rejected_by_user
+          - failed_payment
+          type: string
+        supplierBankAccount:
+          $ref: '#/components/schemas/SupplierBankAccount'
+      required:
+      - invoiceDate
+      - invoiceNumber
+      - status
+      type: object
+    InvoiceInformationV1:
+      description: "In the case of an invoice, additional information pertaining to\
+        \ the invoice would be represented here."
+      example:
+        dueDate: 2000-01-23T04:56:07.000+00:00
+        invoiceNumber: invoiceNumber
+        invoiceDate: 2000-01-23T04:56:07.000+00:00
+        paymentDate: 2000-01-23T04:56:07.000+00:00
+        supplierBankAccount:
+          bankCode: bankCode
+          country: DK
+          iban: iban
+          bankName: bankName
+          accountNumber: accountNumber
+          bic: bic
+        status: pending_approval
+      nullable: true
+      properties:
+        dueDate:
+          description: Date the payment is due
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DD
+          type: string
+        invoiceDate:
+          description: Date the invoice was issued
+          format: date-time
+          pattern: YYYY-MM-DD
+          type: string
+        invoiceNumber:
+          description: The invoice number
+          type: string
+        paymentDate:
+          description: Date the invoice was paid if the status is paid
+          format: date-time
+          nullable: true
+          pattern: YYYY-MM-DD
+          type: string
+        status:
+          description: The invoice status
+          enum:
+          - pending_approval
+          - parsed
+          - preparing
+          - prepared
+          - ready
+          - rejected_by_approver
+          - marked_as_paid
+          - scheduled
+          - payment_in_progress
+          - paid
+          - voided_by_user
+          - rejected_by_user
+          - failed_payment
+          type: string
+        supplierBankAccount:
+          $ref: '#/components/schemas/SupplierBankAccount'
+      required:
+      - invoiceDate
+      - invoiceNumber
+      - status
+      type: object
+    LinksResponse:
+      description: Contains links relevant to the export item
+      example:
+        web:
+          exportItem: http://example.com
+        mobile:
+          exportItem: http://example.com
+        api:
+          exportItem: http://example.com
+      properties:
+        api:
+          additionalProperties:
+            type: string
+          type: object
+        mobile:
+          additionalProperties:
+            type: string
+          type: object
+        web:
+          additionalProperties:
+            type: string
+          type: object
+      type: object
+    MoneyModel:
+      description: Total amount in the Pleo wallet's currency of the spend
+      example:
+        currency: UNDEFINED
+        value: 0.8008281904610115
+      properties:
+        currency:
+          enum:
+          - UNDEFINED
+          - AED
+          - AFN
+          - ALL
+          - AMD
+          - ANG
+          - AOA
+          - ARS
+          - AUD
+          - AWG
+          - AZN
+          - BAM
+          - BBD
+          - BDT
+          - BGN
+          - BHD
+          - BIF
+          - BMD
+          - BND
+          - BOB
+          - BOV
+          - BRL
+          - BSD
+          - BTN
+          - BWP
+          - BYN
+          - BYR
+          - BZD
+          - CAD
+          - CDF
+          - CHE
+          - CHF
+          - CHW
+          - CLF
+          - CLP
+          - CNY
+          - COP
+          - COU
+          - CRC
+          - CUC
+          - CUP
+          - CVE
+          - CZK
+          - DJF
+          - DKK
+          - DOP
+          - DZD
+          - EGP
+          - ERN
+          - ETB
+          - EUR
+          - FJD
+          - FKP
+          - GBP
+          - GEL
+          - GHS
+          - GIP
+          - GMD
+          - GNF
+          - GTQ
+          - GYD
+          - HKD
+          - HNL
+          - HRK
+          - HTG
+          - HUF
+          - IDR
+          - ILS
+          - INR
+          - IQD
+          - IRR
+          - ISK
+          - JMD
+          - JOD
+          - JPY
+          - KES
+          - KGS
+          - KHR
+          - KMF
+          - KPW
+          - KRW
+          - KWD
+          - KYD
+          - KZT
+          - LAK
+          - LBP
+          - LKR
+          - LRD
+          - LSL
+          - LTL
+          - LYD
+          - MAD
+          - MDL
+          - MGA
+          - MKD
+          - MMK
+          - MNT
+          - MOP
+          - MRO
+          - MRU
+          - MUR
+          - MVR
+          - MWK
+          - MXN
+          - MXV
+          - MYR
+          - MZN
+          - NAD
+          - NGN
+          - NIO
+          - NOK
+          - NPR
+          - NZD
+          - OMR
+          - PAB
+          - PEN
+          - PGK
+          - PHP
+          - PKR
+          - PLN
+          - PYG
+          - QAR
+          - RON
+          - RSD
+          - RUB
+          - RUR
+          - RWF
+          - SAR
+          - SBD
+          - SCR
+          - SDG
+          - SEK
+          - SGD
+          - SHP
+          - SLL
+          - SOS
+          - SRD
+          - SSP
+          - STD
+          - STN
+          - SVC
+          - SYP
+          - SZL
+          - THB
+          - TJS
+          - TMT
+          - TND
+          - TOP
+          - TRY
+          - TTD
+          - TWD
+          - TZS
+          - UAH
+          - UGX
+          - USD
+          - USN
+          - USS
+          - UYI
+          - UYU
+          - UZS
+          - VEF
+          - VES
+          - VND
+          - VUV
+          - WST
+          - XAF
+          - XAG
+          - XAU
+          - XBA
+          - XBB
+          - XBC
+          - XBD
+          - XCD
+          - XDR
+          - XOF
+          - XPD
+          - XPF
+          - XPT
+          - XSU
+          - XTS
+          - XUA
+          - XXX
+          - YER
+          - ZAR
+          - ZMW
+          - ZWL
+          type: string
+        value:
+          type: number
+      required:
+      - currency
+      - value
+      type: object
+    PageOrder:
+      enum:
+      - ASC
+      - ASC_NULLS_FIRST
+      - ASC_NULLS_LAST
+      - DESC
+      - DESC_NULLS_FIRST
+      - DESC_NULLS_LAST
+      type: string
+    Supplier:
+      description: The supplier or merchant involved
+      example:
+        country: DK
+        identifier: identifier
+        name: GOOGLE*ADS8693645259
+        taxIdentifier: taxIdentifier
+        categoryCode: "5999"
+        account: account
+      nullable: true
+      properties:
+        account:
+          description: Supplier account code in the accounting system
+          nullable: true
+          type: string
+        categoryCode:
+          description: This is the category code that describes the merchant/supplier's
+            activity
+          example: "5999"
+          nullable: true
+          type: string
+        country:
+          description: The 2-letter country code the merchant or supplier operates
+            in
+          enum:
+          - UNDEFINED
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - EZ
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XI
+          - XU
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
+          example: DK
+          maxLength: 2
+          minLength: 2
+          nullable: true
+          type: string
+        identifier:
+          description: Identifier of the supplier in the accounting system
+          nullable: true
+          type: string
+        name:
+          description: Name of the supplier or merchant
+          example: GOOGLE*ADS8693645259
+          nullable: true
+          type: string
+        taxIdentifier:
+          description: This is the tax identification of the supplier in their country
+            of operation
+          nullable: true
+          type: string
+      type: object
+    SupplierBankAccount:
+      description: Bank account information of the supplier
+      example:
+        bankCode: bankCode
+        country: DK
+        iban: iban
+        bankName: bankName
+        accountNumber: accountNumber
+        bic: bic
+      nullable: true
+      properties:
+        accountNumber:
+          description: Bank account number
+          nullable: true
+          type: string
+        bankCode:
+          description: Bank code
+          nullable: true
+          type: string
+        bankName:
+          description: Name of the bank
+          type: string
+        bic:
+          description: Branch information
+          nullable: true
+          type: string
+        country:
+          description: Country the bank is located in. This would be the 2 letter
+            country code
+          enum:
+          - UNDEFINED
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - EZ
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XI
+          - XU
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
+          example: DK
+          maxLength: 2
+          minLength: 2
+          type: string
+        iban:
+          description: Unique international bank account number
+          nullable: true
+          type: string
+      required:
+      - bankName
+      - country
+      type: object
+    SupplierV1:
+      description: The supplier or merchant involved
+      example:
+        country: DK
+        code: code
+        name: GOOGLE*ADS8693645259
+        taxIdentifier: taxIdentifier
+        categoryCode: "5999"
+        account: account
+      nullable: true
+      properties:
+        account:
+          description: Supplier account code in the accounting system
+          nullable: true
+          type: string
+        categoryCode:
+          description: This is the category code that describes the merchant/supplier's
+            activity
+          example: "5999"
+          nullable: true
+          type: string
+        code:
+          description: Identifier of the supplier in the accounting system
+          nullable: true
+          type: string
+        country:
+          description: The 2-letter country code the merchant or supplier operates
+            in
+          enum:
+          - UNDEFINED
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AX
+          - AZ
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BL
+          - BM
+          - BN
+          - BO
+          - BQ
+          - BR
+          - BS
+          - BT
+          - BU
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CP
+          - CR
+          - CS
+          - CU
+          - CV
+          - CW
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DG
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EA
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - EZ
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - FX
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - IC
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - MC
+          - MD
+          - ME
+          - MF
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - "NO"
+          - NP
+          - NR
+          - NT
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SF
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - SS
+          - ST
+          - SU
+          - SV
+          - SX
+          - SY
+          - SZ
+          - TA
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - XI
+          - XU
+          - XK
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZR
+          - ZW
+          example: DK
+          maxLength: 2
+          minLength: 2
+          nullable: true
+          type: string
+        name:
+          description: Name of the supplier or merchant
+          example: GOOGLE*ADS8693645259
+          nullable: true
+          type: string
+        taxIdentifier:
+          description: This is the tax identification of the supplier in their country
+            of operation
+          nullable: true
+          type: string
+      type: object
+    Tag:
+      description: "Tags are used to appropriate funds to specific projects, cost\
+        \ centers, departments, etc. This is what is known as \"tags\" in Pleo."
+      example:
+        code: code
+        groupCode: groupCode
+      nullable: true
+      properties:
+        code:
+          description: "This is the identifier to the specific cost allocation item.\
+            \ e.g. the specific project, department, etc."
+          type: string
+        groupCode:
+          description: "Allocation grouping, e.g. project, cost center, department\
+            \ or if the if dimensions are being used, this would be the dimension\
+            \ group identifier."
+          type: string
+      required:
+      - code
+      - groupCode
+      type: object
+    TagV1:
+      description: "Tags are used to appropriate funds to specific projects, cost\
+        \ centers, departments, etc. This is what is known as \"tags\" in Pleo."
+      example:
+        code: code
+        id: 00000000-0000-0000-0000-000000000000
+        groupCode: groupCode
+      nullable: true
+      properties:
+        code:
+          description: "This is the identifier to the specific cost allocation item.\
+            \ e.g. the specific project, department, etc."
+          type: string
+        groupCode:
+          description: "Allocation grouping, e.g. project, cost center, department\
+            \ or if the if dimensions are being used, this would be the dimension\
+            \ group identifier."
+          type: string
+        id:
+          description: This is the Pleo internal identifier of the tag
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+      required:
+      - code
+      - groupCode
+      - id
+      type: object
+    Tax:
+      description: Tax details applicable to this accounting entry line. The tax details
+        would usually either have the code or the identifier or both.
+      example:
+        amount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        code: code
+        rate: 0.2
+        type: inclusive
+      nullable: true
+      properties:
+        amount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        code:
+          description: Tax code
+          nullable: true
+          type: string
+        rate:
+          description: Tax rate. This is represented in decimals and not the percentage.
+            e.g. 20% tax rate would be 0.20
+          example: 0.2
+          type: number
+        type:
+          enum:
+          - inclusive
+          - exclusive
+          - reverse
+          type: string
+      required:
+      - amount
+      - rate
+      - type
+      type: object
+    TaxV1:
+      description: Tax details applicable to this accounting entry line. The tax details
+        would usually either have the code or the identifier or both.
+      example:
+        amount:
+          inSupplierCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+          inWalletCurrency:
+            currency: UNDEFINED
+            value: 0.8008281904610115
+        code: code
+        rate: 0.2
+        id: 00000000-0000-0000-0000-000000000000
+        type: inclusive
+      nullable: true
+      properties:
+        amount:
+          $ref: '#/components/schemas/ExportItemAmount'
+        code:
+          description: Tax code
+          nullable: true
+          type: string
+        id:
+          description: This is the Pleo internal identifier of the tax code
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        rate:
+          description: Tax rate. This is represented in decimals and not the percentage.
+            e.g. 20% tax rate would be 0.20
+          example: 0.2
+          type: number
+        type:
+          description: Tax type
+          enum:
+          - inclusive
+          - exclusive
+          - reverse
+          type: string
+      required:
+      - amount
+      - id
+      - rate
+      - type
+      type: object
+    Team:
+      description: Teams are assigned to an expense to categorize it or associate
+        it with a specific team within the company
+      example:
+        code: code
+        name: Marketing
+        id: 00000000-0000-0000-0000-000000000000
+      nullable: true
+      properties:
+        code:
+          description: "Team code, usually the unique identifier of the team in the\
+            \ accounting system"
+          nullable: true
+          type: string
+        id:
+          description: This is the Pleo internal identifier of the team
+          example: 00000000-0000-0000-0000-000000000000
+          format: uuid
+          type: string
+        name:
+          description: This is the name of the team
+          example: Marketing
+          type: string
+      required:
+      - id
+      - name
+      type: object
+    UpdateExportJobItem:
+      example:
+        externalUrl: externalUrl
+        accountingEntryId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        failureReason: failureReason
+        failureReasonType: receipt_upload_failure
+        exportedAt: 2000-01-23T04:56:07.000+00:00
+        externalId: externalId
+        status: pending
+      properties:
+        accountingEntryId:
+          description: ID of the accounting entry being updated
+          format: uuid
+          type: string
+        exportedAt:
+          description: Date and time of the export attempt
+          format: date-time
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+        externalId:
+          description: The accounting system identifier of the entry after export
+          type: string
+        externalUrl:
+          description: URL to access the resource of the entry in the accounting system
+          type: string
+        failureReason:
+          description: Detailed message explaining the failure
+          type: string
+        failureReasonType:
+          description: "If the export of this accounting entry failed, specify the\
+            \ failure reason type"
+          enum:
+          - receipt_upload_failure
+          - receipt_download_failure
+          - receipt_file_size_limit_exceeded
+          - receipt_conversion_failure
+          - unexpected_failure
+          - invalid_configuration
+          - missing_configuration
+          - accounting_system_authentication_failure
+          - accounting_system_rate_limit
+          - accounting_system_unreachable
+          - validation_failure
+          - accounting_system_validation_failure
+          - authorization_failure
+          - accounting_system_timeout
+          type: string
+        status:
+          description: Status of the export Item after being processed
+          enum:
+          - pending
+          - in_progress
+          - failed
+          - successful
+          - abandoned
+          type: string
+      required:
+      - accountingEntryId
+      - status
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true

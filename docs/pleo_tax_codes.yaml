@@ -1,0 +1,433 @@
+openapi: 3.0.1
+info:
+  title: Tax Code API
+  description: Tax Codes OpenAPI definitions
+  termsOfService: https://pleo.io/terms/
+  contact:
+    email: team-expense-core@pleo.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 42.14.0
+servers:
+  - url: https://external.pleo.io
+    description: Production server
+  - url: https://external.staging.pleo.io
+    description: Staging server
+security:
+  - bearerAuth: []
+tags:
+  - name: tax-codes
+    description: Tax Codes API
+paths:
+  /v0/tax-codes:
+    post:
+      tags:
+        - tax-codes
+      summary: Create a new tax code
+      operationId: createTaxCode
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TaxCodeCreateUpdateModel'
+        required: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTaxCodeModel'
+  /v0/tax-codes/{taxCodeId}:
+    get:
+      tags:
+        - tax-codes
+      summary: Returns a given tax code
+      operationId: getTaxCode
+      parameters:
+        - name: taxCodeId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Tax code ID to fetch
+            format: uuid
+      responses:
+        default:
+          description: default response
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTaxCodeModel'
+    put:
+      tags:
+        - tax-codes
+      summary: Update an tax code
+      operationId: updateTaxCode
+      parameters:
+        - name: taxCodeId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Tax code ID to update
+            format: uuid
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TaxCodeCreateUpdateModel'
+        required: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTaxCodeModel'
+    delete:
+      tags:
+        - tax-codes
+      summary: Delete an tax code
+      operationId: deleteTaxCode
+      parameters:
+        - name: taxCodeId
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            description: Tax code ID to delete
+            format: uuid
+      responses:
+        default:
+          description: default response
+          content:
+            application/json;charset=UTF-8: {}
+  /v0/tax-codes:search:
+    post:
+      tags:
+        - tax-codes
+      summary: Returns a list of tax codes
+      operationId: getTaxCodes
+      parameters:
+        - name: company_id
+          in: query
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            description: Fetch a list of tax codes for a given company
+            format: uuid
+        - name: before
+          in: query
+          description: >-
+            Lower bound of the page of data to return (cannot be used together
+            with [after] or [offset])
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: >-
+            Upper bound of the page of data to return (cannot be used together
+            with [before] or [offset])
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: >-
+            Offset of the page of data to return (cannot be used together with
+            [before] or [after])
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int64
+        - name: limit
+          in: query
+          description: The maximum amount of items to return
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            format: int32
+        - name: sorting_keys
+          in: query
+          description: The keys to sort the results by
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: sorting_order
+          in: query
+          description: >-
+            The order to sort the results by. Must be the same length as
+            [sortingKeys]; one order per key
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PageOrder'
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TaxCodeSearchRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseTaxCodeModel'
+components:
+  schemas:
+    CursorPageCurrentRequestInfo:
+      required:
+        - parameters
+      type: object
+      properties:
+        after:
+          type: string
+        before:
+          type: string
+        limit:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int64
+        parameters:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        sortingKeys:
+          type: array
+          items:
+            type: string
+        sortingOrder:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageOrder'
+    CursorPageInfo:
+      required:
+        - currentRequestPagination
+        - hasNextPage
+        - hasPreviousPage
+      type: object
+      properties:
+        currentRequestPagination:
+          $ref: '#/components/schemas/CursorPageCurrentRequestInfo'
+        endCursor:
+          type: string
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+        startCursor:
+          type: string
+        total:
+          type: integer
+          format: int64
+    CursorPaginatedResponseTaxCodeModel:
+      required:
+        - data
+        - pagination
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxCodeModel'
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+    DataResponseTaxCodeModel:
+      required:
+        - data
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TaxCodeModel'
+    PageOrder:
+      type: string
+      enum:
+        - ASC
+        - ASC_NULLS_FIRST
+        - ASC_NULLS_LAST
+        - DESC
+        - DESC_NULLS_FIRST
+        - DESC_NULLS_LAST
+    TaxCodeCreateUpdateModel:
+      required:
+        - archived
+        - companyId
+        - name
+        - rate
+        - type
+      type: object
+      properties:
+        archived:
+          type: boolean
+          description: >-
+            Boolean flag used to archive or unarchive a category (when set to
+            true, account is not visible or usable on the platform)
+        code:
+          type: string
+          description: The accounting system's internal identifier of the tax code
+          nullable: true
+          example: '01'
+        companyId:
+          type: string
+          description: Company ID the tax code is being created/updated for
+          format: uuid
+        ingoingTaxAccount:
+          type: string
+          description: Ingoing tax account usually used to account for reverse VAT
+          nullable: true
+        name:
+          type: string
+          description: Name of the tax code
+          example: Standardmoms (25 %)
+        outgoingTaxAccount:
+          type: string
+          description: Outgoing tax account usually used to account for reverse VAT
+          nullable: true
+        rate:
+          type: number
+          description: >-
+            Percentage rate applied for this tax code (This is represented in
+            decimals and not the percentage. e.g. 20% tax rate would be 0.20)
+        type:
+          type: string
+          description: Classification of this tax code
+          enum:
+            - inclusive
+            - exclusive
+            - reverse
+    TaxCodeModel:
+      required:
+        - archived
+        - companyId
+        - createdAt
+        - id
+        - name
+        - rate
+        - type
+        - updatedAt
+      type: object
+      properties:
+        accountingIntegrationSystem:
+          type: string
+          description: Accounting integration system
+          nullable: true
+        archived:
+          type: boolean
+          description: >-
+            Boolean flag used to archive or unarchive an account (when set to
+            true, account is not visible or usable on the platform)
+        code:
+          type: string
+          description: The accounting system's internal identifier of the tax code
+          nullable: true
+          example: '01'
+        companyId:
+          type: string
+          description: The Pleo unique identifier of the company the tax code belongs to
+          format: uuid
+        createdAt:
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+          description: Date and time the tax code was created
+          format: date-time
+        id:
+          type: string
+          description: The unique identifier generated by Pleo for the tax code
+          format: uuid
+        ingoingTaxAccount:
+          type: string
+          description: Ingoing tax account usually used to account for reverse VAT
+          nullable: true
+        name:
+          type: string
+          description: Name of the tax code
+          example: Standardmoms (25 %)
+        outgoingTaxAccount:
+          type: string
+          description: Outgoing tax account usually used to account for reverse VAT
+          nullable: true
+        rate:
+          type: number
+          description: >-
+            Percentage rate applied for this tax code (This is represented in
+            decimals and not the percentage. e.g. 20% tax rate would be 0.20)
+        type:
+          type: string
+          description: Classification of this tax code
+          enum:
+            - inclusive
+            - exclusive
+            - reverse
+        updatedAt:
+          pattern: YYYY-MM-DDTHH:mi:ssZ
+          type: string
+          description: Date and time the tax code was last updated
+          format: date-time
+    TaxCodeSearchRequest:
+      type: object
+      properties:
+        archived:
+          type: boolean
+          description: >-
+            If set to true will only return tax codes that have been archived,
+            if set to false will only return tax codes that have not been
+            archived. By default,both archived and non-archived tax codes will
+            be returned.
+        taxCodeIds:
+          uniqueItems: true
+          type: array
+          description: >-
+            Useful for fetching a list of tax codes given a specific list of
+            IDs.
+          items:
+            type: string
+            description: >-
+              Useful for fetching a list of tax codes given a specific list of
+              IDs.
+            format: uuid
+        type:
+          type: string
+          description: Classification of the tax codes to fetch
+          enum:
+            - inclusive
+            - exclusive
+            - reverse
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true

@@ -1,0 +1,1942 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: team-expense-core@pleo.io
+  description: Tags OpenAPI definitions
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://pleo.io/terms/
+  title: Tags API
+  version: 31.38.0
+servers:
+- description: Production server
+  url: https://external.pleo.io
+- description: Staging server
+  url: https://external.staging.pleo.io
+security:
+- bearerAuth: []
+paths:
+  /v0/aggregations/tag-groups:
+    get:
+      description: "You need to supply either the company_id or the organization_id\
+        \ query parameter. If you supply both, the company_id will be used. If you\
+        \ supply neither, the request will fail. If you supply the company_id, the\
+        \ response will contain only the tag groups for that company. If you supply\
+        \ the organization_id, the response will contain the tag groups for all companies\
+        \ in the organization. If you supply the company_id and the organization_id,\
+        \ the response will contain only the tag groups for the company."
+      operationId: getAggregatedTagGroups
+      parameters:
+      - explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: organization_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: tag_group_ids
+        required: false
+        schema:
+          items:
+            format: uuid
+            type: string
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseListAggregatedTagGroupModel'
+          description: default response
+      summary: Returns all tag groups for given company in an aggregated format
+      tags:
+      - tag-groups
+  /v0/aggregations/tags:
+    post:
+      operationId: searchAggregatedTags
+      parameters:
+      - explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/AggregatedTagSearchRequest'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseAggregatedTagModel'
+          description: default response
+      summary: Search and return aggregated tags
+      tags:
+      - tags
+  /v0/tag-groups:
+    get:
+      description: "You need to supply either the company_id or the organization_id\
+        \ query parameter. If you supply both, the company_id will be used. If you\
+        \ supply neither, the request will fail. If you supply the company_id, the\
+        \ response will contain only the tag groups for that company. If you supply\
+        \ the organization_id, the response will contain the tag groups for all companies\
+        \ in the organization. If you supply the company_id and the organization_id,\
+        \ the response will contain only the tag groups for the company."
+      operationId: getTagGroups
+      parameters:
+      - explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: organization_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseListTagGroupModel'
+          description: default response
+      summary: Returns all tag groups for given company
+      tags:
+      - tag-groups
+    post:
+      operationId: createTagGroup
+      parameters:
+      - explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagGroupCreateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupModel'
+          description: default response
+      summary: Creates a new tag group resource
+      tags:
+      - tag-groups
+  /v0/tag-groups/{groupId}:
+    delete:
+      operationId: deleteTagGroup
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                type: boolean
+          description: default response
+      summary: Deletes the tag group resource by id
+      tags:
+      - tag-groups
+    get:
+      operationId: getTagGroup
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupModel'
+          description: default response
+      summary: Returns the tag group resource by id
+      tags:
+      - tag-groups
+    put:
+      operationId: updateTagGroup
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagGroupUpdateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupModel'
+          description: default response
+      summary: Updates the tag group resource by id
+      tags:
+      - tag-groups
+  /v0/tag-groups/{groupId}/dimensions:
+    get:
+      description: This endpoint will return a list of tag group dimensions excluding
+        the name and code dimensions which are always present in a tag group. The
+        name and code dimensions are returned only when they do not follow the standard
+        name and code naming convention.
+      operationId: getTagGroupDimensions
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group to fetch dimensions for
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseListTagGroupDimensionModel'
+          description: default response
+      summary: Get a list of tag group dimensions
+      tags:
+      - tag-groups
+    post:
+      operationId: createTagGroupDimension
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group this dimension belongs to
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagGroupDimensionCreateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupDimensionModel'
+          description: default response
+      summary: Creates a new tag group dimension
+      tags:
+      - tag-groups
+  /v0/tag-groups/{groupId}/dimensions/{dimensionId}:
+    delete:
+      operationId: deleteTagGroupDimension
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group this dimension belongs to
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group dimension to be deleted
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8: {}
+          description: default response
+      summary: Delete a tag group dimension
+      tags:
+      - tag-groups
+    get:
+      operationId: getTagGroupDimension
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group to fetch dimensions for
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group dimension to be retrieved
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupDimensionModel'
+          description: default response
+      summary: Get a tag group dimension
+      tags:
+      - tag-groups
+    put:
+      operationId: updateTagGroupDimension
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group this dimension belongs to
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          description: Unique identifier of the Tag Group dimension to be updated
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagGroupDimensionUpdateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagGroupDimensionModel'
+          description: default response
+      summary: Update a tag group dimension
+      tags:
+      - tag-groups
+  /v0/tag-groups/{groupId}/tags:
+    get:
+      operationId: getTags
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      - explode: true
+        in: query
+        name: include_archived
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseTagModel'
+          description: default response
+      summary: Returns tags for given tag group
+      tags:
+      - tags
+    post:
+      operationId: createTag
+      parameters:
+      - explode: false
+        in: path
+        name: groupId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagCreateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagModel'
+          description: default response
+      summary: Creates a new tag sub-resource under the given tag group
+      tags:
+      - tags
+  /v0/tags:
+    get:
+      operationId: searchTags
+      parameters:
+      - explode: true
+        in: query
+        name: company_id
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: text_search
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Lower bound of the page of data to return (cannot be used together\
+          \ with [after] or [offset])"
+        explode: true
+        in: query
+        name: before
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Upper bound of the page of data to return (cannot be used together\
+          \ with [before] or [offset])"
+        explode: true
+        in: query
+        name: after
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "Offset of the page of data to return (cannot be used together\
+          \ with [before] or [after])"
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The maximum amount of items to return
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The keys to sort the results by
+        explode: true
+        in: query
+        name: sorting_keys
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "The order to sort the results by. Must be the same length as\
+          \ [sortingKeys]; one order per key"
+        explode: true
+        in: query
+        name: sorting_order
+        required: false
+        schema:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+        style: form
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/CursorPaginatedResponseTagModel'
+          description: default response
+      summary: Search tags
+      tags:
+      - tags
+  /v0/tags/{tagId}:
+    delete:
+      operationId: deleteTag
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8: {}
+          description: default response
+      summary: Deletes tag by id
+      tags:
+      - tags
+    get:
+      operationId: getTag
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagModel'
+          description: default response
+      summary: Returns tag by id
+      tags:
+      - tags
+    put:
+      operationId: updateTag
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagUpdateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagModel'
+          description: default response
+      summary: Updates tag by id
+      tags:
+      - tags
+  /v0/tags/{tagId}/dimensions:
+    get:
+      operationId: getTagDimensionValues
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseListTagDimensionValueModel'
+          description: default response
+      summary: Fetches dimension values
+      tags:
+      - tags
+  /v0/tags/{tagId}/dimensions/{dimensionId}:
+    delete:
+      operationId: deleteDimensionValue
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagDimensionValueModel'
+          description: default response
+      summary: Deletes a dimension value
+      tags:
+      - tags
+    get:
+      operationId: getDimensionValue
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagDimensionValueModel'
+          description: default response
+      summary: Gets a dimension value
+      tags:
+      - tags
+    post:
+      operationId: createDimensionValue
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagDimensionValueCreateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagDimensionValueModel'
+          description: default response
+      summary: Creates a dimension value
+      tags:
+      - tags
+    put:
+      operationId: updateDimensionValue
+      parameters:
+      - explode: false
+        in: path
+        name: tagId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      - explode: false
+        in: path
+        name: dimensionId
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/TagDimensionValueUpdateModel'
+      responses:
+        default:
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/DataResponseTagDimensionValueModel'
+          description: default response
+      summary: Updates a dimension value
+      tags:
+      - tags
+components:
+  schemas:
+    AggregatedTagGroupDimensionModel:
+      description: List of all the dimensions associated with this tag group
+      example:
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        visible: false
+        displayOrder: 0
+        name: Project
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+      properties:
+        code:
+          description: External identifier of the Tag group Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        displayOrder:
+          description: Value of the given dimension for the given tag
+          format: int32
+          type: integer
+        id:
+          description: Unique identifier of Tag Group Dimension
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name of Tag Group Dimension
+          example: Project
+          type: string
+        visible:
+          description: Determines if this dimension is displayed in the UI
+          example: false
+          type: boolean
+      required:
+      - code
+      - displayOrder
+      - id
+      - name
+      - visible
+      type: object
+    AggregatedTagGroupModel:
+      example:
+        archived: false
+        createdAt: 2023-08-23T03:11:48Z
+        companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        name: Projects
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        dimensions:
+        - code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          displayOrder: 0
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        - code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          displayOrder: 0
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        archived:
+          description: This tag group is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag group / Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        companyId:
+          description: Unique identifier of the company the Tag Group belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        dimensions:
+          description: List of all the dimensions associated with this tag group
+          items:
+            $ref: '#/components/schemas/AggregatedTagGroupDimensionModel'
+          type: array
+        id:
+          description: Unique identifier of Tag Group (generated on creation)
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name of Tag Group
+          example: Projects
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+      required:
+      - archived
+      - code
+      - companyId
+      - createdAt
+      - dimensions
+      - id
+      - name
+      - updatedAt
+      type: object
+    AggregatedTagModel:
+      example:
+        archived: false
+        createdAt: 2023-08-23T03:11:48Z
+        companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        code: "12345"
+        name: Lunch allowance
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        dimensions:
+        - code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          displayOrder: 1
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          value: value
+        - code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          displayOrder: 1
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          value: value
+        group:
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: c04c7e9e-6c15-11ee-b962-0242ac120003
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        archived:
+          description: This tag is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag
+          example: "12345"
+          type: string
+        companyId:
+          description: Unique identifier of the company the Tag Group belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        dimensions:
+          description: List of all the dimensions and dimension values associated
+            with the tag
+          items:
+            $ref: '#/components/schemas/AggregatedTagTagDimensionModel'
+          type: array
+        group:
+          $ref: '#/components/schemas/AggregatedTagTagGroupModel'
+        id:
+          description: Unique identifier of Tag
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name that is used for the possible value within
+            a tag group on an expense
+          example: Lunch allowance
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+      required:
+      - archived
+      - code
+      - companyId
+      - createdAt
+      - dimensions
+      - group
+      - id
+      - updatedAt
+      type: object
+    AggregatedTagSearchRequest:
+      example:
+        textSearch: textSearch
+        tagIds:
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        - 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+      properties:
+        tagIds:
+          description: Useful for fetching a list of tags given a specific list of
+            IDs.
+          items:
+            description: Useful for fetching a list of tags given a specific list
+              of IDs.
+            format: uuid
+            type: string
+          type: array
+          uniqueItems: true
+        textSearch:
+          description: Free text search for tags by name
+          type: string
+      type: object
+    AggregatedTagTagDimensionModel:
+      description: List of all the dimensions and dimension values associated with
+        the tag
+      example:
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        visible: false
+        displayOrder: 1
+        name: Project
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        value: value
+      properties:
+        code:
+          description: External identifier of the Tag group Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        displayOrder:
+          description: Determines the order in which the dimensions are displayed
+            in the UI. Starts from 1
+          example: 1
+          format: int32
+          type: integer
+        id:
+          description: Unique identifier of Tag Group Dimension
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name of Tag Group Dimension
+          example: Project
+          type: string
+        value:
+          description: Value of the given dimension for the given tag
+          type: string
+        visible:
+          description: Determines if this dimension is displayed in the UI
+          example: false
+          type: boolean
+      required:
+      - code
+      - displayOrder
+      - id
+      - name
+      - value
+      - visible
+      type: object
+    AggregatedTagTagGroupModel:
+      description: Details of the Tag Group this tag belongs to
+      example:
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        name: c04c7e9e-6c15-11ee-b962-0242ac120003
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+      properties:
+        code:
+          description: External identifier of the Tag group / Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        id:
+          description: Unique identifier of Tag Group (generated on creation)
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: Unique identifier of the company the Tag Group belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          type: string
+      required:
+      - code
+      - id
+      - name
+      type: object
+    CursorPageCurrentRequestInfo:
+      example:
+        sortingKeys:
+        - sortingKeys
+        - sortingKeys
+        sortingOrder:
+        - null
+        - null
+        offset: 6
+        before: before
+        limit: 0
+        after: after
+        parameters:
+          key:
+          - parameters
+          - parameters
+      properties:
+        after:
+          type: string
+        before:
+          type: string
+        limit:
+          format: int32
+          type: integer
+        offset:
+          format: int64
+          type: integer
+        parameters:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+        sortingKeys:
+          items:
+            type: string
+          type: array
+        sortingOrder:
+          items:
+            $ref: '#/components/schemas/PageOrder'
+          type: array
+      required:
+      - parameters
+      type: object
+    CursorPageInfo:
+      example:
+        currentRequestPagination:
+          sortingKeys:
+          - sortingKeys
+          - sortingKeys
+          sortingOrder:
+          - null
+          - null
+          offset: 6
+          before: before
+          limit: 0
+          after: after
+          parameters:
+            key:
+            - parameters
+            - parameters
+        total: 1
+        hasNextPage: true
+        hasPreviousPage: true
+        endCursor: endCursor
+        startCursor: startCursor
+      properties:
+        currentRequestPagination:
+          $ref: '#/components/schemas/CursorPageCurrentRequestInfo'
+        endCursor:
+          type: string
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+        startCursor:
+          type: string
+        total:
+          format: int64
+          type: integer
+      required:
+      - currentRequestPagination
+      - hasNextPage
+      - hasPreviousPage
+      type: object
+    CursorPaginatedResponseAggregatedTagModel:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 6
+            before: before
+            limit: 0
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 1
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          code: "12345"
+          name: Lunch allowance
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          dimensions:
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 1
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+            value: value
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 1
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+            value: value
+          group:
+            code: 5524f270-6c21-11ee-b962-0242ac120002
+            name: c04c7e9e-6c15-11ee-b962-0242ac120003
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          code: "12345"
+          name: Lunch allowance
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          dimensions:
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 1
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+            value: value
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 1
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+            value: value
+          group:
+            code: 5524f270-6c21-11ee-b962-0242ac120002
+            name: c04c7e9e-6c15-11ee-b962-0242ac120003
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/AggregatedTagModel'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    CursorPaginatedResponseTagModel:
+      example:
+        pagination:
+          currentRequestPagination:
+            sortingKeys:
+            - sortingKeys
+            - sortingKeys
+            sortingOrder:
+            - null
+            - null
+            offset: 6
+            before: before
+            limit: 0
+            after: after
+            parameters:
+              key:
+              - parameters
+              - parameters
+          total: 1
+          hasNextPage: true
+          hasPreviousPage: true
+          endCursor: endCursor
+          startCursor: startCursor
+        data:
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          code: "12345"
+          groupId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: Lunch allowance
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          code: "12345"
+          groupId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: Lunch allowance
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TagModel'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/CursorPageInfo'
+      required:
+      - data
+      - pagination
+      type: object
+    DataResponseListAggregatedTagGroupModel:
+      example:
+        data:
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: Projects
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          dimensions:
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 0
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 0
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: Projects
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          dimensions:
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 0
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          - code: 5524f270-6c21-11ee-b962-0242ac120002
+            visible: false
+            displayOrder: 0
+            name: Project
+            id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/AggregatedTagGroupModel'
+          type: array
+      required:
+      - data
+      type: object
+    DataResponseListTagDimensionValueModel:
+      example:
+        data:
+        - createdAt: 2023-08-23T03:11:48Z
+          dimensionId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          tagId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          value: value
+          updatedAt: 2023-08-23T03:11:48Z
+        - createdAt: 2023-08-23T03:11:48Z
+          dimensionId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          tagId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          value: value
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TagDimensionValueModel'
+          type: array
+      required:
+      - data
+      type: object
+    DataResponseListTagGroupDimensionModel:
+      example:
+        data:
+        - createdAt: 2023-08-23T03:11:48Z
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          groupId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          displayOrder: 1
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+        - createdAt: 2023-08-23T03:11:48Z
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          groupId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          displayOrder: 1
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TagGroupDimensionModel'
+          type: array
+      required:
+      - data
+      type: object
+    DataResponseListTagGroupModel:
+      example:
+        data:
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          metadata:
+            externalExtraId: f302f9ec-6c17-11ee-b962-0242ac120002
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: Projects
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+        - archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          metadata:
+            externalExtraId: f302f9ec-6c17-11ee-b962-0242ac120002
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: Projects
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TagGroupModel'
+          type: array
+      required:
+      - data
+      type: object
+    DataResponseTagDimensionValueModel:
+      example:
+        data:
+          createdAt: 2023-08-23T03:11:48Z
+          dimensionId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          tagId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          value: value
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          $ref: '#/components/schemas/TagDimensionValueModel'
+      required:
+      - data
+      type: object
+    DataResponseTagGroupDimensionModel:
+      example:
+        data:
+          createdAt: 2023-08-23T03:11:48Z
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          visible: false
+          groupId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          displayOrder: 1
+          name: Project
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          $ref: '#/components/schemas/TagGroupDimensionModel'
+      required:
+      - data
+      type: object
+    DataResponseTagGroupModel:
+      example:
+        data:
+          archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+          metadata:
+            externalExtraId: f302f9ec-6c17-11ee-b962-0242ac120002
+          code: 5524f270-6c21-11ee-b962-0242ac120002
+          name: Projects
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          $ref: '#/components/schemas/TagGroupModel'
+      required:
+      - data
+      type: object
+    DataResponseTagModel:
+      example:
+        data:
+          archived: false
+          createdAt: 2023-08-23T03:11:48Z
+          code: "12345"
+          groupId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          name: Lunch allowance
+          id: c04c7e9e-6c15-11ee-b962-0242ac120002
+          updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        data:
+          $ref: '#/components/schemas/TagModel'
+      required:
+      - data
+      type: object
+    PageOrder:
+      enum:
+      - ASC
+      - ASC_NULLS_FIRST
+      - ASC_NULLS_LAST
+      - DESC
+      - DESC_NULLS_FIRST
+      - DESC_NULLS_LAST
+      type: string
+    TagCreateModel:
+      example:
+        archived: false
+        code: "12345"
+        name: Lunch allowance
+      properties:
+        archived:
+          description: This tag is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag
+          example: "12345"
+          type: string
+        name:
+          description: User readable name that is used for the possible value within
+            a tag group on an expense
+          example: Lunch allowance
+          type: string
+      required:
+      - archived
+      - code
+      type: object
+    TagDimensionValueCreateModel:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      required:
+      - value
+      type: object
+    TagDimensionValueModel:
+      example:
+        createdAt: 2023-08-23T03:11:48Z
+        dimensionId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        tagId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        value: value
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        dimensionId:
+          description: Unique identifier of the Tag Group Dimension this dimension
+            value is associated with
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        tagId:
+          description: Unique identifier of the Tag this dimension value belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        value:
+          description: Value of the given dimension for the given tag
+          type: string
+      required:
+      - createdAt
+      - dimensionId
+      - tagId
+      - updatedAt
+      - value
+      type: object
+    TagDimensionValueUpdateModel:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      required:
+      - value
+      type: object
+    TagGroupCreateModel:
+      example:
+        archived: true
+        metadata:
+          key: metadata
+        code: code
+        name: name
+      properties:
+        archived:
+          type: boolean
+        code:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        name:
+          type: string
+      required:
+      - archived
+      - code
+      - name
+      type: object
+    TagGroupDimensionCreateModel:
+      example:
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        visible: false
+        displayOrder: 1
+        name: Project
+      properties:
+        code:
+          description: External identifier of the Tag group Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        displayOrder:
+          description: Determines the order in which the dimensions are displayed
+            in the UI. Starts from 1
+          example: 1
+          format: int32
+          type: integer
+        name:
+          description: User readable name of Tag Group Dimension
+          example: Project
+          type: string
+        visible:
+          description: Determines if this dimension is displayed in the UI
+          example: false
+          type: boolean
+      required:
+      - code
+      - displayOrder
+      - name
+      - visible
+      type: object
+    TagGroupDimensionModel:
+      example:
+        createdAt: 2023-08-23T03:11:48Z
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        visible: false
+        groupId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        displayOrder: 1
+        name: Project
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        code:
+          description: External identifier of the Tag group Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        displayOrder:
+          description: Determines the order in which the dimensions are displayed
+            in the UI. Starts from 1
+          example: 1
+          format: int32
+          type: integer
+        groupId:
+          description: Unique identifier of the Tag Group this dimension belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        id:
+          description: Unique identifier of Tag Group Dimension (generated on creation)
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name of Tag Group Dimension
+          example: Project
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        visible:
+          description: Determines if this dimension is displayed in the UI
+          example: false
+          type: boolean
+      required:
+      - code
+      - createdAt
+      - displayOrder
+      - groupId
+      - id
+      - name
+      - updatedAt
+      - visible
+      type: object
+    TagGroupDimensionUpdateModel:
+      example:
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        visible: false
+        displayOrder: 1
+        name: Project
+      properties:
+        code:
+          description: External identifier of the Tag group Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        displayOrder:
+          description: Determines the order in which the dimensions are displayed
+            in the UI. Starts from 1
+          example: 1
+          format: int32
+          type: integer
+        name:
+          description: User readable name of Tag Group Dimension
+          example: Project
+          type: string
+        visible:
+          description: Determines if this dimension is displayed in the UI
+          example: false
+          type: boolean
+      required:
+      - code
+      - displayOrder
+      - name
+      - visible
+      type: object
+    TagGroupModel:
+      example:
+        archived: false
+        createdAt: 2023-08-23T03:11:48Z
+        companyId: c04c7e9e-6c15-11ee-b962-0242ac120003
+        metadata:
+          externalExtraId: f302f9ec-6c17-11ee-b962-0242ac120002
+        code: 5524f270-6c21-11ee-b962-0242ac120002
+        name: Projects
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        archived:
+          description: This tag group is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag group / Dimension used for mapping
+            to accounting system
+          example: 5524f270-6c21-11ee-b962-0242ac120002
+          type: string
+        companyId:
+          description: Unique identifier of the company the Tag Group belongs to
+          example: c04c7e9e-6c15-11ee-b962-0242ac120003
+          format: uuid
+          type: string
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        id:
+          description: Unique identifier of Tag Group (generated on creation)
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        metadata:
+          additionalProperties:
+            description: Place for API users to store flexible data
+            example: "{\"externalExtraId\":\"f302f9ec-6c17-11ee-b962-0242ac120002\"\
+              }"
+            type: string
+          description: Place for API users to store flexible data
+          example:
+            externalExtraId: f302f9ec-6c17-11ee-b962-0242ac120002
+          type: object
+        name:
+          description: User readable name of Tag Group
+          example: Projects
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+      required:
+      - archived
+      - code
+      - companyId
+      - createdAt
+      - id
+      - metadata
+      - name
+      - updatedAt
+      type: object
+    TagGroupUpdateModel:
+      example:
+        archived: true
+        metadata:
+          key: metadata
+        code: code
+        name: name
+      properties:
+        archived:
+          type: boolean
+        code:
+          type: string
+        metadata:
+          additionalProperties:
+            type: string
+          type: object
+        name:
+          type: string
+      required:
+      - archived
+      - code
+      - metadata
+      - name
+      type: object
+    TagModel:
+      example:
+        archived: false
+        createdAt: 2023-08-23T03:11:48Z
+        code: "12345"
+        groupId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        name: Lunch allowance
+        id: c04c7e9e-6c15-11ee-b962-0242ac120002
+        updatedAt: 2023-08-23T03:11:48Z
+      properties:
+        archived:
+          description: This tag is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag
+          example: "12345"
+          type: string
+        createdAt:
+          description: Creation date and time
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+        groupId:
+          description: Unique identifier of the Tag Group this tag belongs to
+          format: uuid
+          type: string
+        id:
+          description: Unique identifier of Tag
+          example: c04c7e9e-6c15-11ee-b962-0242ac120002
+          format: uuid
+          type: string
+        name:
+          description: User readable name that is used for the possible value within
+            a tag group on an expense
+          example: Lunch allowance
+          type: string
+        updatedAt:
+          description: Date and time of the last update
+          example: 2023-08-23T03:11:48Z
+          format: date-time
+          type: string
+      required:
+      - archived
+      - code
+      - createdAt
+      - groupId
+      - id
+      - updatedAt
+      type: object
+    TagUpdateModel:
+      example:
+        archived: false
+        code: "12345"
+        name: Lunch allowance
+      properties:
+        archived:
+          description: This tag is not used anymore
+          example: false
+          type: boolean
+        code:
+          description: External identifier of the Tag
+          example: "12345"
+          type: string
+        name:
+          description: User readable name that is used for the possible value within
+            a tag group on an expense
+          example: Lunch allowance
+          type: string
+      required:
+      - archived
+      - code
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true

@@ -4,7 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/dieagenturverwaltung/pleo-api/swagger"
+	"github.com/dieagenturverwaltung/pleo-api/export"
+	"github.com/dieagenturverwaltung/pleo-api/tags"
+	"github.com/dieagenturverwaltung/pleo-api/tax_codes"
 	"golang.org/x/oauth2"
 )
 
@@ -33,8 +35,14 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 	return token, nil
 }
 
+type HttpClient struct {
+	Export   *export.APIClient
+	Tags     *tags.APIClient
+	TaxCodes *tax_codes.APIClient
+}
+
 // Http creates a new API client with the provided token.
-func (client *Client) Http(ctx context.Context, token *oauth2.Token, updateTokenFunc func(updatedToken *oauth2.Token)) *swagger.APIClient {
+func (client *Client) Http(ctx context.Context, token *oauth2.Token, updateTokenFunc func(updatedToken *oauth2.Token)) *HttpClient {
 	source := client.config.TokenSource(ctx, token)
 
 	newClient := oauth2.NewClient(ctx, &tokenSourceWrapper{
@@ -42,10 +50,13 @@ func (client *Client) Http(ctx context.Context, token *oauth2.Token, updateToken
 		source:       source,
 		onUpdate:     updateTokenFunc,
 	})
-	return swagger.NewAPIClient(&swagger.Configuration{
-		BasePath:      client.baseURL,
-		DefaultHeader: make(map[string]string),
-		UserAgent:     "DieAgenturVerwaltung/1.0.0/go",
-		HTTPClient:    newClient,
-	})
+
+	config := client.openApiConfiguration
+	config.HTTPClient = newClient
+
+	return &HttpClient{
+		Export:   export.NewAPIClient(&config),
+		Tags:     tags.NewAPIClient(&config),
+		TaxCodes: tax_codes.NewAPIClient(&config),
+	}
 }
