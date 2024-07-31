@@ -41,18 +41,27 @@ type HttpClient struct {
 	TaxCodes *tax_codes.APIClient
 }
 
+type HttpConfiguration struct {
+	Token         *oauth2.Token
+	OnTokenUpdate func(token *oauth2.Token)
+	Logger        func(string, ...any)
+	Debug         bool
+}
+
 // Http creates a new API client with the provided token.
-func (client *Client) Http(ctx context.Context, token *oauth2.Token, updateTokenFunc func(updatedToken *oauth2.Token)) *HttpClient {
-	source := client.config.TokenSource(ctx, token)
+func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpClient {
+	source := client.config.TokenSource(ctx, cfg.Token)
 
 	newClient := oauth2.NewClient(ctx, &tokenSourceWrapper{
-		currentToken: token,
+		currentToken: cfg.Token,
 		source:       source,
-		onUpdate:     updateTokenFunc,
+		onUpdate:     cfg.OnTokenUpdate,
 	})
 
 	config := client.openApiConfiguration
 	config.HTTPClient = newClient
+	config.Logger = cfg.Logger
+	config.Debug = cfg.Debug
 
 	return &HttpClient{
 		Export:   export.NewAPIClient(&config),

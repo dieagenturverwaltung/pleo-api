@@ -96,6 +96,7 @@ type Configuration struct {
 	Servers          ServerConfigurations
 	OperationServers map[string]ServerConfigurations
 	HTTPClient       *http.Client
+	Logger           func(string, ...interface{})
 }
 
 // NewConfiguration returns a new Configuration object

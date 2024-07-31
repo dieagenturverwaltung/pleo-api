@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dieagenturverwaltung/pleo-api/swagger"
 	"golang.org/x/oauth2"
 )
 
@@ -20,6 +19,7 @@ type tokenConfigData struct {
 	Token        *oauth2.Token `json:"token"`
 	ClientID     string        `json:"client_id"`
 	ClientSecret string        `json:"client_secret"`
+	CompanyID    string        `json:"company_id"`
 }
 
 func init() {
@@ -47,7 +47,7 @@ func onTokenChange(newToken *oauth2.Token) {
 	}
 }
 
-func client() (*swagger.APIClient, context.CancelFunc) {
+func client() (*HttpClient, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 
 	return New(tokenConfig.ClientID, tokenConfig.ClientSecret, true, AllScopes...).Http(ctx, tokenConfig.Token, onTokenChange), cancel
@@ -60,7 +60,7 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		_, _, err := client.TagGroupsApi.GetTagGroups(ctx, nil)
+		_, _, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).CompanyId(tokenConfig.CompanyID).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}

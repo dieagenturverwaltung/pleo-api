@@ -67,6 +67,10 @@ func NewAPIClient(cfg *shared.Configuration) *APIClient {
 		cfg.HTTPClient = http.DefaultClient
 	}
 
+	if cfg.Logger == nil {
+		cfg.Logger = log.Printf
+	}
+
 	c := &APIClient{}
 	c.cfg = cfg
 	c.common.client = c
@@ -170,7 +174,7 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		if err != nil {
 			return nil, err
 		}
-		log.Printf("\n%s\n", string(dump))
+		c.cfg.Logger("\n%s\n", string(dump))
 	}
 
 	resp, err := c.cfg.HTTPClient.Do(request)
@@ -183,7 +187,7 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		if err != nil {
 			return resp, err
 		}
-		log.Printf("\n%s\n", string(dump))
+		c.cfg.Logger("\n%s\n", string(dump))
 	}
 	return resp, err
 }
