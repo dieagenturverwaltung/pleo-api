@@ -96,6 +96,7 @@ type Configuration struct {
 	Servers          ServerConfigurations
 	OperationServers map[string]ServerConfigurations
 	HTTPClient       *http.Client
+	CompanyID        *string
 	Logger           func(string, ...interface{})
 }
 

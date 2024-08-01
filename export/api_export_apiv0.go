@@ -632,6 +632,7 @@ func (a *ExportAPIV0ApiService) GetExportJobsList(ctx context.Context) ApiGetExp
 	return ApiGetExportJobsListRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 

@@ -412,6 +412,7 @@ func (a *TaxCodesApiService) GetTaxCodes(ctx context.Context) ApiGetTaxCodesRequ
 	return ApiGetTaxCodesRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 

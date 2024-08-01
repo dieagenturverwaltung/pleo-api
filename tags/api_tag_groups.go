@@ -55,6 +55,7 @@ func (a *TagGroupsApiService) CreateTagGroup(ctx context.Context) ApiCreateTagGr
 	return ApiCreateTagGroupRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 
@@ -505,6 +506,7 @@ func (a *TagGroupsApiService) GetAggregatedTagGroups(ctx context.Context) ApiGet
 	return ApiGetAggregatedTagGroupsRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 
@@ -974,6 +976,7 @@ func (a *TagGroupsApiService) GetTagGroups(ctx context.Context) ApiGetTagGroupsR
 	return ApiGetTagGroupsRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 

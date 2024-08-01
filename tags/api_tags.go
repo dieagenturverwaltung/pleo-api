@@ -1063,6 +1063,7 @@ func (a *TagsApiService) SearchAggregatedTags(ctx context.Context) ApiSearchAggr
 	return ApiSearchAggregatedTagsRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 
@@ -1261,6 +1262,7 @@ func (a *TagsApiService) SearchTags(ctx context.Context) ApiSearchTagsRequest {
 	return ApiSearchTagsRequest{
 		ApiService: a,
 		ctx:        ctx,
+		companyId:  a.client.cfg.CompanyID,
 	}
 }
 

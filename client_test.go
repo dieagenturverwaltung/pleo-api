@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"encoding/json"
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -49,8 +50,15 @@ func onTokenChange(newToken *oauth2.Token) {
 
 func client() (*HttpClient, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	cfg := &HttpConfiguration{
+		Token:         tokenConfig.Token,
+		CompanyID:     &tokenConfig.CompanyID,
+		OnTokenUpdate: onTokenChange,
+		Debug:         true,
+		Logger:        log.Printf,
+	}
 
-	return New(tokenConfig.ClientID, tokenConfig.ClientSecret, true, AllScopes...).Http(ctx, tokenConfig.Token, onTokenChange), cancel
+	return New(tokenConfig.ClientID, tokenConfig.ClientSecret, true, AllScopes...).Http(ctx, cfg), cancel
 }
 
 func TestTagGroup(t *testing.T) {
@@ -60,7 +68,7 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		_, _, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).CompanyId(tokenConfig.CompanyID).Execute()
+		_, _, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}

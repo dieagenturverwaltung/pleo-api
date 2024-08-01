@@ -43,6 +43,7 @@ type HttpClient struct {
 
 type HttpConfiguration struct {
 	Token         *oauth2.Token
+	CompanyID     *string
 	OnTokenUpdate func(token *oauth2.Token)
 	Logger        func(string, ...any)
 	Debug         bool
@@ -62,6 +63,7 @@ func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpCli
 	config.HTTPClient = newClient
 	config.Logger = cfg.Logger
 	config.Debug = cfg.Debug
+	config.CompanyID = cfg.CompanyID
 
 	return &HttpClient{
 		Export:   export.NewAPIClient(&config),
