@@ -1,0 +1,318 @@
+openapi: 3.0.1
+info:
+  title: App Marketplace API
+  description: API for Pleo App Marketplace
+  termsOfService: https://pleo.io/terms/
+  contact:
+    email: partner-ecosystem-team@pleo.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 29.4.0
+servers:
+  - url: https://external.pleo.io
+    description: Production server
+  - url: https://external.staging.pleo.io
+    description: Staging server
+security:
+  - bearerAuth: []
+tags:
+  - name: Applications
+    description: >-
+      Applications that are available in the Pleo App Marketplace. Applications
+      connect Pleo with target systems and to make the user experience better,
+      the application are typically named after the target system they are
+      integrating with. <br> The main use case for these APIs is to list and
+      manage the applications that are available in the Pleo App Marketplace.
+      <br> You can also use this API to find out which applications are
+      installed for a specific resource.
+    externalDocs:
+      description: Read more about applications
+      url: >-
+        https://www.notion.so/pleo/Application-41194c1252fa42f5946e3c3d0f028b96?pvs=4
+  - name: Installations
+    description: >-
+      Installations of applications. An installation is a representation of an
+      application being installed for a resource. Currently we support companies
+      and organizations, future support might include users or teams. <br>
+      Installations are created automatically after a successful OAuth flow.
+      <br> The main use case for these APIs is to enable third party apps to
+      manage their own installations and to get information about the
+      installations that exist for a specific resource.
+    externalDocs:
+      description: Read more about installations
+      url: >-
+        https://www.notion.so/pleo/Installation-dbf7ce32f2e84848b8a36a5ebeaeb8f0?pvs=4
+  - name: Authentication
+    description: >-
+      Authentication is done using a JWT token. The token should be passed in
+      the Authorization header as a Bearer token. If the token is not present an
+      HTTP 401 Unauthorized response will be returned.
+  - name: health
+paths:
+  /v1/installations/completions:
+    put:
+      tags:
+        - Installations
+      summary: Complete the installation of a client
+      description: >-
+        **Deprecated**: Please use /installations/me:activate instead. Marks the
+        installation as complete
+      operationId: completeInstallationExternalClientOnlyIdempotently
+      responses:
+        '200':
+          description: Installation completed.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Cannot complete installation due to infrastructure issue
+      deprecated: true
+  /v1/installations/me:
+    get:
+      tags:
+        - Installations
+      summary: Get client installation
+      description: Get client's installation
+      operationId: getClientInstallation
+      responses:
+        '200':
+          description: Installation exists.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Cannot retrieve installation due to infrastructure issue
+    put:
+      tags:
+        - Installations
+      summary: Update a client installation
+      description: Updates an installation
+      operationId: updateClientInstallation
+      requestBody:
+        description: Installation request
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/UpdateInstallationRequest'
+        required: true
+      responses:
+        '200':
+          description: Installation updated.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Cannot update installation due to infrastructure issue
+    post:
+      tags:
+        - Installations
+      summary: Create a client installation
+      description: Creates a client installation
+      operationId: createClientInstallation
+      requestBody:
+        description: Installation request
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateClientInstallationRequest'
+        required: true
+      responses:
+        '200':
+          description: Installation created.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Cannot create installation due to infrastructure issue
+    delete:
+      tags:
+        - Installations
+      summary: Delete client's installation
+      description: >-
+        Deletes the installation for the client and will revoke all access and
+        refresh tokens for the client.
+      operationId: deleteClientInstallation
+      responses:
+        '204':
+          description: Installation deleted successfully
+        '404':
+          description: Installation does not exist
+        '502':
+          description: Installation could not be deleted due to infrastructure issue
+  /v1/installations/me:activate:
+    post:
+      tags:
+        - Installations
+      summary: Activate the installation for a client
+      description: Activates the installation for the client.
+      operationId: activateMyInstallation
+      responses:
+        '200':
+          description: Installation updated.
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/InstallationResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Cannot activate the installation due to infrastructure issue
+components:
+  schemas:
+    CreateClientInstallationRequest:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: >-
+            The error code to indicate why installation is INACTIVE. Can only be
+            set when status is INACTIVE.
+          example: AUTH_ERROR
+          enum:
+            - NOT_ENTITLED
+            - AUTH_ERROR
+            - INTEGRATION_ERROR
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: >-
+              Metadata associated with the installation. This can be used to
+              store additional information about the installation, for example 
+              external references, but it is not used by any Pleo system
+            example:
+              externalConfigurationId: '123456789'
+          description: >-
+            Metadata associated with the installation. This can be used to store
+            additional information about the installation, for example  external
+            references, but it is not used by any Pleo system
+          example:
+            externalConfigurationId: '123456789'
+        status:
+          type: string
+          description: >-
+            The status of the installation. If it is ACTIVATED, it means that
+            the application is installed and operational.
+          example: ACTIVATED
+          default: ACTIVATED
+          enum:
+            - ACTIVATED
+            - INACTIVE
+            - AUTHORIZED
+            - PENDING_INTEGRATION
+    InstallationResponse:
+      required:
+        - applicationId
+        - createdAt
+        - id
+        - metadata
+        - resource
+        - status
+        - updatedAt
+      type: object
+      properties:
+        applicationId:
+          type: string
+          description: The unique identifier of the application this installation is for
+          format: uuid
+          readOnly: true
+          example: 123e4567-e89b-12d3-a456-426614174000
+        createdAt:
+          type: string
+          description: The date and time the installation was created
+          format: date-time
+          readOnly: true
+          example: '2021-01-01T00:00:00Z'
+        errorCode:
+          type: string
+          description: The text to indicate why installation is inactive
+          readOnly: true
+          example: NOT_ENTITLED
+        id:
+          type: string
+          description: The unique identifier of the installation
+          format: uuid
+          readOnly: true
+          example: 123e4567-e89b-12d3-a456-426614174000
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: The metadata of the installation
+            example:
+              key: value
+          description: The metadata of the installation
+          example:
+            key: value
+        resource:
+          type: string
+          description: The resource that the installation is for
+          readOnly: true
+          example: urn:pleo:company:123e4567-e89b-12d3-a456-426614174000
+        status:
+          type: string
+          description: The status of the installation
+          example: ACTIVATED
+          enum:
+            - ACTIVATED
+            - INACTIVE
+            - AUTHORIZED
+            - PENDING_INTEGRATION
+        updatedAt:
+          type: string
+          description: The date and time the installation was last updated
+          format: date-time
+          readOnly: true
+          example: '2021-01-01T00:00:00Z'
+    UpdateInstallationRequest:
+      required:
+        - status
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+            description: >-
+              A means to store any metadata about the installation. Could for
+              example be settings for the application
+            example:
+              externalApplicationId: '123456789'
+          description: >-
+            A means to store any metadata about the installation. Could for
+            example be settings for the application
+          example:
+            externalApplicationId: '123456789'
+        status:
+          type: string
+          description: >-
+            The status of the installation. If it is ACTIVATED, it means that
+            the application is installed and operational.
+          example: ACTIVATED
+          default: ACTIVATED
+          enum:
+            - ACTIVATED
+            - INACTIVE
+            - AUTHORIZED
+            - PENDING_INTEGRATION
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
