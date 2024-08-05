@@ -2,6 +2,7 @@ package pleo_api
 
 import (
 	"context"
+	"strings"
 	"sync"
 
 	"github.com/dieagenturverwaltung/pleo-api/export"
@@ -11,11 +12,19 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type pleoError string
+
+func (e pleoError) Error() string {
+	return string(e)
+}
+
+const ErrRefreshTokenExpired = pleoError("refresh token expired")
+
 type tokenSourceWrapper struct {
 	mu           sync.Mutex
 	currentToken *oauth2.Token
 	source       oauth2.TokenSource
-	onUpdate     func(updatedToken *oauth2.Token)
+	onUpdate     func(updatedToken *oauth2.Token, refreshError error)
 }
 
 func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
@@ -23,13 +32,20 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 	defer w.mu.Unlock()
 	token, err := w.source.Token()
 	if err != nil {
+		if w.onUpdate != nil {
+			if strings.Contains(err.Error(), "invalid_refresh_token") {
+				go w.onUpdate(nil, ErrRefreshTokenExpired)
+			} else {
+				go w.onUpdate(nil, err)
+			}
+		}
 		return nil, err
 	}
 
 	if w.currentToken.AccessToken != token.AccessToken {
 		w.currentToken = token
 		if w.onUpdate != nil {
-			go w.onUpdate(token)
+			go w.onUpdate(token, nil)
 		}
 	}
 
@@ -46,7 +62,7 @@ type HttpClient struct {
 type HttpConfiguration struct {
 	Token         *oauth2.Token
 	CompanyID     *string
-	OnTokenUpdate func(token *oauth2.Token)
+	OnTokenUpdate func(token *oauth2.Token, refreshError error)
 	Logger        func(string, ...any)
 	Debug         bool
 }
