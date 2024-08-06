@@ -13,7 +13,8 @@ package tags
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // TagGroupModel struct for TagGroupModel
@@ -25,7 +26,7 @@ type TagGroupModel struct {
 	// Unique identifier of the company the Tag Group belongs to
 	CompanyId string `json:"companyId"`
 	// Creation date and time
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt shared.Time `json:"createdAt"`
 	// Unique identifier of Tag Group (generated on creation)
 	Id string `json:"id"`
 	// Place for API users to store flexible data
@@ -33,14 +34,14 @@ type TagGroupModel struct {
 	// User readable name of Tag Group
 	Name string `json:"name"`
 	// Date and time of the last update
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt shared.Time `json:"updatedAt"`
 }
 
 // NewTagGroupModel instantiates a new TagGroupModel object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTagGroupModel(archived bool, code string, companyId string, createdAt time.Time, id string, metadata map[string]string, name string, updatedAt time.Time) *TagGroupModel {
+func NewTagGroupModel(archived bool, code string, companyId string, createdAt shared.Time, id string, metadata map[string]string, name string, updatedAt shared.Time) *TagGroupModel {
 	this := TagGroupModel{}
 	this.Archived = archived
 	this.Code = code
@@ -134,9 +135,9 @@ func (o *TagGroupModel) SetCompanyId(v string) {
 }
 
 // GetCreatedAt returns the CreatedAt field value
-func (o *TagGroupModel) GetCreatedAt() time.Time {
+func (o *TagGroupModel) GetCreatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -145,7 +146,7 @@ func (o *TagGroupModel) GetCreatedAt() time.Time {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TagGroupModel) GetCreatedAtOk() (*time.Time, bool) {
+func (o *TagGroupModel) GetCreatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -153,7 +154,7 @@ func (o *TagGroupModel) GetCreatedAtOk() (*time.Time, bool) {
 }
 
 // SetCreatedAt sets field value
-func (o *TagGroupModel) SetCreatedAt(v time.Time) {
+func (o *TagGroupModel) SetCreatedAt(v shared.Time) {
 	o.CreatedAt = v
 }
 
@@ -230,9 +231,9 @@ func (o *TagGroupModel) SetName(v string) {
 }
 
 // GetUpdatedAt returns the UpdatedAt field value
-func (o *TagGroupModel) GetUpdatedAt() time.Time {
+func (o *TagGroupModel) GetUpdatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -241,7 +242,7 @@ func (o *TagGroupModel) GetUpdatedAt() time.Time {
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TagGroupModel) GetUpdatedAtOk() (*time.Time, bool) {
+func (o *TagGroupModel) GetUpdatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -249,7 +250,7 @@ func (o *TagGroupModel) GetUpdatedAtOk() (*time.Time, bool) {
 }
 
 // SetUpdatedAt sets field value
-func (o *TagGroupModel) SetUpdatedAt(v time.Time) {
+func (o *TagGroupModel) SetUpdatedAt(v shared.Time) {
 	o.UpdatedAt = v
 }
 

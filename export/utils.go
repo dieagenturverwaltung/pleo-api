@@ -291,39 +291,3 @@ func (v *NullableString) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-type NullableTime struct {
-	value *time.Time
-	isSet bool
-}
-
-func (v NullableTime) Get() *time.Time {
-	return v.value
-}
-
-func (v *NullableTime) Set(val *time.Time) {
-	v.value = val
-	v.isSet = true
-}
-
-func (v NullableTime) IsSet() bool {
-	return v.isSet
-}
-
-func (v *NullableTime) Unset() {
-	v.value = nil
-	v.isSet = false
-}
-
-func NewNullableTime(val *time.Time) *NullableTime {
-	return &NullableTime{value: val, isSet: true}
-}
-
-func (v NullableTime) MarshalJSON() ([]byte, error) {
-	return v.value.MarshalJSON()
-}
-
-func (v *NullableTime) UnmarshalJSON(src []byte) error {
-	v.isSet = true
-	return json.Unmarshal(src, &v.value)
-}

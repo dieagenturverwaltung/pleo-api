@@ -13,7 +13,8 @@ package marketplace
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // InstallationResponse struct for InstallationResponse
@@ -21,7 +22,7 @@ type InstallationResponse struct {
 	// The unique identifier of the application this installation is for
 	ApplicationId string `json:"applicationId"`
 	// The date and time the installation was created
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt shared.Time `json:"createdAt"`
 	// The text to indicate why installation is inactive
 	ErrorCode *string `json:"errorCode,omitempty"`
 	// The unique identifier of the installation
@@ -33,14 +34,14 @@ type InstallationResponse struct {
 	// The status of the installation
 	Status string `json:"status"`
 	// The date and time the installation was last updated
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt shared.Time `json:"updatedAt"`
 }
 
 // NewInstallationResponse instantiates a new InstallationResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInstallationResponse(applicationId string, createdAt time.Time, id string, metadata map[string]map[string]interface{}, resource string, status string, updatedAt time.Time) *InstallationResponse {
+func NewInstallationResponse(applicationId string, createdAt shared.Time, id string, metadata map[string]map[string]interface{}, resource string, status string, updatedAt shared.Time) *InstallationResponse {
 	this := InstallationResponse{}
 	this.ApplicationId = applicationId
 	this.CreatedAt = createdAt
@@ -85,9 +86,9 @@ func (o *InstallationResponse) SetApplicationId(v string) {
 }
 
 // GetCreatedAt returns the CreatedAt field value
-func (o *InstallationResponse) GetCreatedAt() time.Time {
+func (o *InstallationResponse) GetCreatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -96,7 +97,7 @@ func (o *InstallationResponse) GetCreatedAt() time.Time {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *InstallationResponse) GetCreatedAtOk() (*time.Time, bool) {
+func (o *InstallationResponse) GetCreatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -104,7 +105,7 @@ func (o *InstallationResponse) GetCreatedAtOk() (*time.Time, bool) {
 }
 
 // SetCreatedAt sets field value
-func (o *InstallationResponse) SetCreatedAt(v time.Time) {
+func (o *InstallationResponse) SetCreatedAt(v shared.Time) {
 	o.CreatedAt = v
 }
 
@@ -237,9 +238,9 @@ func (o *InstallationResponse) SetStatus(v string) {
 }
 
 // GetUpdatedAt returns the UpdatedAt field value
-func (o *InstallationResponse) GetUpdatedAt() time.Time {
+func (o *InstallationResponse) GetUpdatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -248,7 +249,7 @@ func (o *InstallationResponse) GetUpdatedAt() time.Time {
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value
 // and a boolean to check if the value has been set.
-func (o *InstallationResponse) GetUpdatedAtOk() (*time.Time, bool) {
+func (o *InstallationResponse) GetUpdatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -256,7 +257,7 @@ func (o *InstallationResponse) GetUpdatedAtOk() (*time.Time, bool) {
 }
 
 // SetUpdatedAt sets field value
-func (o *InstallationResponse) SetUpdatedAt(v time.Time) {
+func (o *InstallationResponse) SetUpdatedAt(v shared.Time) {
 	o.UpdatedAt = v
 }
 

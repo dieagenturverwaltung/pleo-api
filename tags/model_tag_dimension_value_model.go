@@ -13,19 +13,20 @@ package tags
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // TagDimensionValueModel struct for TagDimensionValueModel
 type TagDimensionValueModel struct {
 	// Creation date and time
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt shared.Time `json:"createdAt"`
 	// Unique identifier of the Tag Group Dimension this dimension value is associated with
 	DimensionId string `json:"dimensionId"`
 	// Unique identifier of the Tag this dimension value belongs to
 	TagId string `json:"tagId"`
 	// Date and time of the last update
-	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedAt shared.Time `json:"updatedAt"`
 	// Value of the given dimension for the given tag
 	Value string `json:"value"`
 }
@@ -34,7 +35,7 @@ type TagDimensionValueModel struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTagDimensionValueModel(createdAt time.Time, dimensionId string, tagId string, updatedAt time.Time, value string) *TagDimensionValueModel {
+func NewTagDimensionValueModel(createdAt shared.Time, dimensionId string, tagId string, updatedAt shared.Time, value string) *TagDimensionValueModel {
 	this := TagDimensionValueModel{}
 	this.CreatedAt = createdAt
 	this.DimensionId = dimensionId
@@ -53,9 +54,9 @@ func NewTagDimensionValueModelWithDefaults() *TagDimensionValueModel {
 }
 
 // GetCreatedAt returns the CreatedAt field value
-func (o *TagDimensionValueModel) GetCreatedAt() time.Time {
+func (o *TagDimensionValueModel) GetCreatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -64,7 +65,7 @@ func (o *TagDimensionValueModel) GetCreatedAt() time.Time {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TagDimensionValueModel) GetCreatedAtOk() (*time.Time, bool) {
+func (o *TagDimensionValueModel) GetCreatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -72,7 +73,7 @@ func (o *TagDimensionValueModel) GetCreatedAtOk() (*time.Time, bool) {
 }
 
 // SetCreatedAt sets field value
-func (o *TagDimensionValueModel) SetCreatedAt(v time.Time) {
+func (o *TagDimensionValueModel) SetCreatedAt(v shared.Time) {
 	o.CreatedAt = v
 }
 
@@ -125,9 +126,9 @@ func (o *TagDimensionValueModel) SetTagId(v string) {
 }
 
 // GetUpdatedAt returns the UpdatedAt field value
-func (o *TagDimensionValueModel) GetUpdatedAt() time.Time {
+func (o *TagDimensionValueModel) GetUpdatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -136,7 +137,7 @@ func (o *TagDimensionValueModel) GetUpdatedAt() time.Time {
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TagDimensionValueModel) GetUpdatedAtOk() (*time.Time, bool) {
+func (o *TagDimensionValueModel) GetUpdatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -144,7 +145,7 @@ func (o *TagDimensionValueModel) GetUpdatedAtOk() (*time.Time, bool) {
 }
 
 // SetUpdatedAt sets field value
-func (o *TagDimensionValueModel) SetUpdatedAt(v time.Time) {
+func (o *TagDimensionValueModel) SetUpdatedAt(v shared.Time) {
 	o.UpdatedAt = v
 }
 

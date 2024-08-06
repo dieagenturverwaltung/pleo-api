@@ -13,7 +13,8 @@ package export
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // UpdateExportJobItem struct for UpdateExportJobItem
@@ -21,7 +22,7 @@ type UpdateExportJobItem struct {
 	// ID of the accounting entry being updated
 	AccountingEntryId string `json:"accountingEntryId"`
 	// Date and time of the export attempt
-	ExportedAt *time.Time `json:"exportedAt,omitempty"`
+	ExportedAt *shared.Time `json:"exportedAt,omitempty"`
 	// The accounting system identifier of the entry after export
 	ExternalId *string `json:"externalId,omitempty"`
 	// URL to access the resource of the entry in the accounting system
@@ -78,9 +79,9 @@ func (o *UpdateExportJobItem) SetAccountingEntryId(v string) {
 }
 
 // GetExportedAt returns the ExportedAt field value if set, zero value otherwise.
-func (o *UpdateExportJobItem) GetExportedAt() time.Time {
+func (o *UpdateExportJobItem) GetExportedAt() shared.Time {
 	if o == nil || o.ExportedAt == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.ExportedAt
@@ -88,7 +89,7 @@ func (o *UpdateExportJobItem) GetExportedAt() time.Time {
 
 // GetExportedAtOk returns a tuple with the ExportedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UpdateExportJobItem) GetExportedAtOk() (*time.Time, bool) {
+func (o *UpdateExportJobItem) GetExportedAtOk() (*shared.Time, bool) {
 	if o == nil || o.ExportedAt == nil {
 		return nil, false
 	}
@@ -104,8 +105,8 @@ func (o *UpdateExportJobItem) HasExportedAt() bool {
 	return false
 }
 
-// SetExportedAt gets a reference to the given time.Time and assigns it to the ExportedAt field.
-func (o *UpdateExportJobItem) SetExportedAt(v time.Time) {
+// SetExportedAt gets a reference to the given shared.Time and assigns it to the ExportedAt field.
+func (o *UpdateExportJobItem) SetExportedAt(v shared.Time) {
 	o.ExportedAt = &v
 }
 

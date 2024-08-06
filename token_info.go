@@ -10,10 +10,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-type tokenInfoRequest struct {
-	Token string `json:"token"`
-}
-
 // TokenInfo
 //
 //	{

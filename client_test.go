@@ -35,7 +35,11 @@ func init() {
 	}
 }
 
-func onTokenChange(newToken *oauth2.Token) {
+func onTokenChange(newToken *oauth2.Token, err error) {
+	if err != nil {
+		panic(err)
+	}
+
 	tokenConfig.Token = newToken
 	marshal, err := json.Marshal(tokenConfig)
 	if err != nil {

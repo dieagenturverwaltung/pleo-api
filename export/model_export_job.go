@@ -13,7 +13,8 @@ package export
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // ExportJob struct for ExportJob
@@ -21,13 +22,13 @@ type ExportJob struct {
 	// The Pleo unique identifier of the company the export job belongs to
 	CompanyId string `json:"companyId"`
 	// Date and time the job was completed
-	CompletedAt NullableTime `json:"completedAt,omitempty"`
+	CompletedAt shared.NullableTime `json:"completedAt,omitempty"`
 	// Date and time the job was created. When the export button is clicked on the Pleo UI, i.e. an export is initiated by the user, the job is created and the createdAt date is set.
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt shared.Time `json:"createdAt"`
 	// This is the Pleo unique identifier of the user that initiated the export job
 	CreatedBy NullableString `json:"createdBy,omitempty"`
 	// Date and time the job expired
-	ExpiredAt NullableTime `json:"expiredAt,omitempty"`
+	ExpiredAt shared.NullableTime `json:"expiredAt,omitempty"`
 	// This is the amount of time in seconds the job will expire relative to the last time an action was taken on the job. The last time an action was taken on the job is reflected by the \"lastUpdatedAt\" field
 	ExpiresIn int32 `json:"expiresIn"`
 	// Reason why the job failed in the case of a failure
@@ -39,11 +40,11 @@ type ExportJob struct {
 	// Indicates whether the export job was initiated by a user or by the system
 	IsInteractive bool `json:"isInteractive"`
 	// Last time the job was updated or action on the job was taken
-	LastUpdatedAt NullableTime `json:"lastUpdatedAt,omitempty"`
+	LastUpdatedAt shared.NullableTime `json:"lastUpdatedAt,omitempty"`
 	// Number of accounting entries that were selected for processing
 	NumberOfItems int32 `json:"numberOfItems"`
 	// Date and time the job was started. When the export-job-events endpoint is called to start the export Job, the startedAt date is set.
-	StartedAt NullableTime `json:"startedAt,omitempty"`
+	StartedAt shared.NullableTime `json:"startedAt,omitempty"`
 	// Specifies the current execution state of the export job. Some here are the definitions of the values that are supported for this field
 	Status string `json:"status"`
 }
@@ -52,7 +53,7 @@ type ExportJob struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewExportJob(companyId string, createdAt time.Time, expiresIn int32, id string, isInteractive bool, numberOfItems int32, status string) *ExportJob {
+func NewExportJob(companyId string, createdAt shared.Time, expiresIn int32, id string, isInteractive bool, numberOfItems int32, status string) *ExportJob {
 	this := ExportJob{}
 	this.CompanyId = companyId
 	this.CreatedAt = createdAt
@@ -97,9 +98,9 @@ func (o *ExportJob) SetCompanyId(v string) {
 }
 
 // GetCompletedAt returns the CompletedAt field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ExportJob) GetCompletedAt() time.Time {
+func (o *ExportJob) GetCompletedAt() shared.Time {
 	if o == nil || o.CompletedAt.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.CompletedAt.Get()
@@ -108,7 +109,7 @@ func (o *ExportJob) GetCompletedAt() time.Time {
 // GetCompletedAtOk returns a tuple with the CompletedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ExportJob) GetCompletedAtOk() (*time.Time, bool) {
+func (o *ExportJob) GetCompletedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -125,7 +126,7 @@ func (o *ExportJob) HasCompletedAt() bool {
 }
 
 // SetCompletedAt gets a reference to the given NullableTime and assigns it to the CompletedAt field.
-func (o *ExportJob) SetCompletedAt(v time.Time) {
+func (o *ExportJob) SetCompletedAt(v shared.Time) {
 	o.CompletedAt.Set(&v)
 }
 
@@ -140,9 +141,9 @@ func (o *ExportJob) UnsetCompletedAt() {
 }
 
 // GetCreatedAt returns the CreatedAt field value
-func (o *ExportJob) GetCreatedAt() time.Time {
+func (o *ExportJob) GetCreatedAt() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -151,7 +152,7 @@ func (o *ExportJob) GetCreatedAt() time.Time {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *ExportJob) GetCreatedAtOk() (*time.Time, bool) {
+func (o *ExportJob) GetCreatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -159,7 +160,7 @@ func (o *ExportJob) GetCreatedAtOk() (*time.Time, bool) {
 }
 
 // SetCreatedAt sets field value
-func (o *ExportJob) SetCreatedAt(v time.Time) {
+func (o *ExportJob) SetCreatedAt(v shared.Time) {
 	o.CreatedAt = v
 }
 
@@ -207,9 +208,9 @@ func (o *ExportJob) UnsetCreatedBy() {
 }
 
 // GetExpiredAt returns the ExpiredAt field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ExportJob) GetExpiredAt() time.Time {
+func (o *ExportJob) GetExpiredAt() shared.Time {
 	if o == nil || o.ExpiredAt.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.ExpiredAt.Get()
@@ -218,7 +219,7 @@ func (o *ExportJob) GetExpiredAt() time.Time {
 // GetExpiredAtOk returns a tuple with the ExpiredAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ExportJob) GetExpiredAtOk() (*time.Time, bool) {
+func (o *ExportJob) GetExpiredAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -235,7 +236,7 @@ func (o *ExportJob) HasExpiredAt() bool {
 }
 
 // SetExpiredAt gets a reference to the given NullableTime and assigns it to the ExpiredAt field.
-func (o *ExportJob) SetExpiredAt(v time.Time) {
+func (o *ExportJob) SetExpiredAt(v shared.Time) {
 	o.ExpiredAt.Set(&v)
 }
 
@@ -408,9 +409,9 @@ func (o *ExportJob) SetIsInteractive(v bool) {
 }
 
 // GetLastUpdatedAt returns the LastUpdatedAt field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ExportJob) GetLastUpdatedAt() time.Time {
+func (o *ExportJob) GetLastUpdatedAt() shared.Time {
 	if o == nil || o.LastUpdatedAt.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.LastUpdatedAt.Get()
@@ -419,7 +420,7 @@ func (o *ExportJob) GetLastUpdatedAt() time.Time {
 // GetLastUpdatedAtOk returns a tuple with the LastUpdatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ExportJob) GetLastUpdatedAtOk() (*time.Time, bool) {
+func (o *ExportJob) GetLastUpdatedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -436,7 +437,7 @@ func (o *ExportJob) HasLastUpdatedAt() bool {
 }
 
 // SetLastUpdatedAt gets a reference to the given NullableTime and assigns it to the LastUpdatedAt field.
-func (o *ExportJob) SetLastUpdatedAt(v time.Time) {
+func (o *ExportJob) SetLastUpdatedAt(v shared.Time) {
 	o.LastUpdatedAt.Set(&v)
 }
 
@@ -475,9 +476,9 @@ func (o *ExportJob) SetNumberOfItems(v int32) {
 }
 
 // GetStartedAt returns the StartedAt field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *ExportJob) GetStartedAt() time.Time {
+func (o *ExportJob) GetStartedAt() shared.Time {
 	if o == nil || o.StartedAt.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.StartedAt.Get()
@@ -486,7 +487,7 @@ func (o *ExportJob) GetStartedAt() time.Time {
 // GetStartedAtOk returns a tuple with the StartedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *ExportJob) GetStartedAtOk() (*time.Time, bool) {
+func (o *ExportJob) GetStartedAtOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -503,7 +504,7 @@ func (o *ExportJob) HasStartedAt() bool {
 }
 
 // SetStartedAt gets a reference to the given NullableTime and assigns it to the StartedAt field.
-func (o *ExportJob) SetStartedAt(v time.Time) {
+func (o *ExportJob) SetStartedAt(v shared.Time) {
 	o.StartedAt.Set(&v)
 }
 

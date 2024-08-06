@@ -13,7 +13,8 @@ package export
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // ExportItem struct for ExportItem
@@ -27,7 +28,7 @@ type ExportItem struct {
 	// Pleo company identifier this export item belongs to
 	CompanyId string `json:"companyId"`
 	// Date the accounting entry should be bookkept
-	Date time.Time `json:"date"`
+	Date shared.Time `json:"date"`
 	// Files that have been attached to this accounting entry
 	Files    []ExportItemFile   `json:"files,omitempty"`
 	Metadata ExportItemMetadata `json:"metadata"`
@@ -45,7 +46,7 @@ type ExportItem struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewExportItem(links LinksResponse, accountingEntryId string, accountingEntryLines []ExportItemLine, amount ExportItemAmount, companyId string, date time.Time, metadata ExportItemMetadata, type_ string, user ExportItemUser) *ExportItem {
+func NewExportItem(links LinksResponse, accountingEntryId string, accountingEntryLines []ExportItemLine, amount ExportItemAmount, companyId string, date shared.Time, metadata ExportItemMetadata, type_ string, user ExportItemUser) *ExportItem {
 	this := ExportItem{}
 	this.Links = links
 	this.AccountingEntryId = accountingEntryId
@@ -188,9 +189,9 @@ func (o *ExportItem) SetCompanyId(v string) {
 }
 
 // GetDate returns the Date field value
-func (o *ExportItem) GetDate() time.Time {
+func (o *ExportItem) GetDate() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -199,7 +200,7 @@ func (o *ExportItem) GetDate() time.Time {
 
 // GetDateOk returns a tuple with the Date field value
 // and a boolean to check if the value has been set.
-func (o *ExportItem) GetDateOk() (*time.Time, bool) {
+func (o *ExportItem) GetDateOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -207,7 +208,7 @@ func (o *ExportItem) GetDateOk() (*time.Time, bool) {
 }
 
 // SetDate sets field value
-func (o *ExportItem) SetDate(v time.Time) {
+func (o *ExportItem) SetDate(v shared.Time) {
 	o.Date = v
 }
 

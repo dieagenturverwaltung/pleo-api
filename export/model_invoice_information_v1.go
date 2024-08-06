@@ -13,19 +13,20 @@ package export
 
 import (
 	"encoding/json"
-	"time"
+
+	"github.com/dieagenturverwaltung/pleo-api/shared"
 )
 
 // InvoiceInformationV1 In the case of an invoice, additional information pertaining to the invoice would be represented here.
 type InvoiceInformationV1 struct {
 	// Date the payment is due
-	DueDate NullableTime `json:"dueDate,omitempty"`
+	DueDate shared.NullableTime `json:"dueDate,omitempty"`
 	// Date the invoice was issued
-	InvoiceDate time.Time `json:"invoiceDate"`
+	InvoiceDate shared.Time `json:"invoiceDate"`
 	// The invoice number
 	InvoiceNumber string `json:"invoiceNumber"`
 	// Date the invoice was paid if the status is paid
-	PaymentDate NullableTime `json:"paymentDate,omitempty"`
+	PaymentDate shared.NullableTime `json:"paymentDate,omitempty"`
 	// The invoice status
 	Status              string                      `json:"status"`
 	SupplierBankAccount NullableSupplierBankAccount `json:"supplierBankAccount,omitempty"`
@@ -35,7 +36,7 @@ type InvoiceInformationV1 struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInvoiceInformationV1(invoiceDate time.Time, invoiceNumber string, status string) *InvoiceInformationV1 {
+func NewInvoiceInformationV1(invoiceDate shared.Time, invoiceNumber string, status string) *InvoiceInformationV1 {
 	this := InvoiceInformationV1{}
 	this.InvoiceDate = invoiceDate
 	this.InvoiceNumber = invoiceNumber
@@ -52,9 +53,9 @@ func NewInvoiceInformationV1WithDefaults() *InvoiceInformationV1 {
 }
 
 // GetDueDate returns the DueDate field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *InvoiceInformationV1) GetDueDate() time.Time {
+func (o *InvoiceInformationV1) GetDueDate() shared.Time {
 	if o == nil || o.DueDate.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.DueDate.Get()
@@ -63,7 +64,7 @@ func (o *InvoiceInformationV1) GetDueDate() time.Time {
 // GetDueDateOk returns a tuple with the DueDate field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *InvoiceInformationV1) GetDueDateOk() (*time.Time, bool) {
+func (o *InvoiceInformationV1) GetDueDateOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -80,7 +81,7 @@ func (o *InvoiceInformationV1) HasDueDate() bool {
 }
 
 // SetDueDate gets a reference to the given NullableTime and assigns it to the DueDate field.
-func (o *InvoiceInformationV1) SetDueDate(v time.Time) {
+func (o *InvoiceInformationV1) SetDueDate(v shared.Time) {
 	o.DueDate.Set(&v)
 }
 
@@ -95,9 +96,9 @@ func (o *InvoiceInformationV1) UnsetDueDate() {
 }
 
 // GetInvoiceDate returns the InvoiceDate field value
-func (o *InvoiceInformationV1) GetInvoiceDate() time.Time {
+func (o *InvoiceInformationV1) GetInvoiceDate() shared.Time {
 	if o == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 
@@ -106,7 +107,7 @@ func (o *InvoiceInformationV1) GetInvoiceDate() time.Time {
 
 // GetInvoiceDateOk returns a tuple with the InvoiceDate field value
 // and a boolean to check if the value has been set.
-func (o *InvoiceInformationV1) GetInvoiceDateOk() (*time.Time, bool) {
+func (o *InvoiceInformationV1) GetInvoiceDateOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -114,7 +115,7 @@ func (o *InvoiceInformationV1) GetInvoiceDateOk() (*time.Time, bool) {
 }
 
 // SetInvoiceDate sets field value
-func (o *InvoiceInformationV1) SetInvoiceDate(v time.Time) {
+func (o *InvoiceInformationV1) SetInvoiceDate(v shared.Time) {
 	o.InvoiceDate = v
 }
 
@@ -143,9 +144,9 @@ func (o *InvoiceInformationV1) SetInvoiceNumber(v string) {
 }
 
 // GetPaymentDate returns the PaymentDate field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *InvoiceInformationV1) GetPaymentDate() time.Time {
+func (o *InvoiceInformationV1) GetPaymentDate() shared.Time {
 	if o == nil || o.PaymentDate.Get() == nil {
-		var ret time.Time
+		var ret shared.Time
 		return ret
 	}
 	return *o.PaymentDate.Get()
@@ -154,7 +155,7 @@ func (o *InvoiceInformationV1) GetPaymentDate() time.Time {
 // GetPaymentDateOk returns a tuple with the PaymentDate field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *InvoiceInformationV1) GetPaymentDateOk() (*time.Time, bool) {
+func (o *InvoiceInformationV1) GetPaymentDateOk() (*shared.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -171,7 +172,7 @@ func (o *InvoiceInformationV1) HasPaymentDate() bool {
 }
 
 // SetPaymentDate gets a reference to the given NullableTime and assigns it to the PaymentDate field.
-func (o *InvoiceInformationV1) SetPaymentDate(v time.Time) {
+func (o *InvoiceInformationV1) SetPaymentDate(v shared.Time) {
 	o.PaymentDate.Set(&v)
 }
 
