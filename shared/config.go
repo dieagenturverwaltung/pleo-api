@@ -11,6 +11,7 @@ type Config struct {
 	HttpClient *http.Client
 	Logger     func(string, ...any)
 	Debug      bool
+	CompanyID  *string
 }
 
 func NewConfig() *Config {

@@ -72,7 +72,7 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		_, _, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).Execute()
+		_, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}

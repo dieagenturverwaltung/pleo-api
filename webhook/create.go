@@ -9,8 +9,11 @@ import (
 type Event string
 
 const (
-	EventJobCreated    Event = "v1.export.job-created"
-	EventVendorCreated Event = "v1.vendor.created"
+	EventExportJobCreated Event = "v1.export-job.created"
+	EventVendorCreated    Event = "v1.vendor.created"
+
+	// Deprecated: use EventExportJobCreated.
+	EventJobCreated Event = "v1.export.job-created"
 )
 
 type Status string
@@ -58,6 +61,11 @@ func (ce *CreateExec) WithEventTypes(eventTypes ...Event) *CreateExec {
 
 func (ce *CreateExec) WithCustomHeaders(headers map[string]any) *CreateExec {
 	ce.body.CustomHeaders = headers
+	return ce
+}
+
+func (ce *CreateExec) WithStatus(status Status) *CreateExec {
+	ce.body.Status = status
 	return ce
 }
 

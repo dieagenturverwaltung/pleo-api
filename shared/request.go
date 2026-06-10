@@ -38,6 +38,9 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
+	if c.UserAgent != "" {
+		request.Header.Set("User-Agent", c.UserAgent)
+	}
 
 	if c.Debug {
 		c.Logger("Sending request: %s %s", method, url)
@@ -74,7 +77,7 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 		return nil, response, err
 	}
 
-	if output != nil {
+	if output != nil && len(responseData) > 0 {
 		err = json.Unmarshal(responseData, output)
 		if err != nil {
 			if c.Debug {

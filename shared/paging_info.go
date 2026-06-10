@@ -8,6 +8,7 @@ import (
 type PagingInfo struct {
 	Before       *string
 	After        *string
+	Offset       *int64
 	Limit        *int
 	SortingKeys  []string
 	SortingOrder []string
@@ -20,6 +21,10 @@ func (pi PagingInfo) Apply(values url.Values) {
 
 	if pi.After != nil {
 		values.Add("after", *pi.After)
+	}
+
+	if pi.Offset != nil {
+		values.Add("offset", strconv.FormatInt(*pi.Offset, 10))
 	}
 
 	if pi.Limit != nil {
