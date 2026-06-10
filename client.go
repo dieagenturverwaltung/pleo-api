@@ -5,10 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/dieagenturverwaltung/pleo-api/export"
-	"github.com/dieagenturverwaltung/pleo-api/marketplace"
-	"github.com/dieagenturverwaltung/pleo-api/tags"
-	"github.com/dieagenturverwaltung/pleo-api/tax_codes"
+	"github.com/dieagenturverwaltung/pleo-api/webhook"
 	"golang.org/x/oauth2"
 )
 
@@ -53,15 +50,11 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 }
 
 type HttpClient struct {
-	Export      *export.APIClient
-	Tags        *tags.APIClient
-	TaxCodes    *tax_codes.APIClient
-	Marketplace *marketplace.APIClient
+	Webhook *webhook.Client
 }
 
 type HttpConfiguration struct {
 	Token         *oauth2.Token
-	CompanyID     *string
 	OnTokenUpdate func(token *oauth2.Token, refreshError error)
 	Logger        func(string, ...any)
 	Debug         bool
@@ -78,15 +71,11 @@ func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpCli
 	})
 
 	config := client.openApiConfiguration
-	config.HTTPClient = newClient
+	config.HttpClient = newClient
 	config.Logger = cfg.Logger
 	config.Debug = cfg.Debug
-	config.CompanyID = cfg.CompanyID
 
 	return &HttpClient{
-		Export:      export.NewAPIClient(&config),
-		Tags:        tags.NewAPIClient(&config),
-		TaxCodes:    tax_codes.NewAPIClient(&config),
-		Marketplace: marketplace.NewAPIClient(&config),
+		Webhook: webhook.New(&config),
 	}
 }
