@@ -15,20 +15,20 @@ const (
 
 type Client struct {
 	config               *oauth2.Config
-	openApiConfiguration shared.Configuration
+	openApiConfiguration shared.Config
 }
 
 func New(clientID, clientSecret string, staging bool, scopes ...string) *Client {
 	var endpoint oauth2.Endpoint
-	var openApiConfiguration shared.Configuration
+	var openApiConfiguration shared.Config
 	if staging {
-		openApiConfiguration = *shared.NewStagingConfiguration()
+		openApiConfiguration = *shared.NewStagingConfig()
 		endpoint = oauth2.Endpoint{
 			AuthURL:  stagingAuthURL,
 			TokenURL: stagingTokenURL,
 		}
 	} else {
-		openApiConfiguration = *shared.NewConfiguration()
+		openApiConfiguration = *shared.NewConfig()
 		endpoint = oauth2.Endpoint{
 			AuthURL:  authURL,
 			TokenURL: tokenURL,

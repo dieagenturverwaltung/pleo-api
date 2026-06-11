@@ -5,10 +5,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/dieagenturverwaltung/pleo-api/export"
+	"github.com/dieagenturverwaltung/pleo-api/companies"
+	"github.com/dieagenturverwaltung/pleo-api/exportapi"
 	"github.com/dieagenturverwaltung/pleo-api/marketplace"
 	"github.com/dieagenturverwaltung/pleo-api/tags"
-	"github.com/dieagenturverwaltung/pleo-api/tax_codes"
+	"github.com/dieagenturverwaltung/pleo-api/taxcodes"
+	"github.com/dieagenturverwaltung/pleo-api/webhook"
 	"golang.org/x/oauth2"
 )
 
@@ -53,10 +55,12 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 }
 
 type HttpClient struct {
-	Export      *export.APIClient
-	Tags        *tags.APIClient
-	TaxCodes    *tax_codes.APIClient
-	Marketplace *marketplace.APIClient
+	Companies   *companies.Client
+	Export      *exportapi.Client
+	Marketplace *marketplace.Client
+	Tags        *tags.Client
+	TaxCodes    *taxcodes.Client
+	Webhook     *webhook.Client
 }
 
 type HttpConfiguration struct {
@@ -78,15 +82,16 @@ func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpCli
 	})
 
 	config := client.openApiConfiguration
-	config.HTTPClient = newClient
+	config.HttpClient = newClient
 	config.Logger = cfg.Logger
 	config.Debug = cfg.Debug
-	config.CompanyID = cfg.CompanyID
 
 	return &HttpClient{
-		Export:      export.NewAPIClient(&config),
-		Tags:        tags.NewAPIClient(&config),
-		TaxCodes:    tax_codes.NewAPIClient(&config),
-		Marketplace: marketplace.NewAPIClient(&config),
+		Companies:   companies.New(&config),
+		Export:      exportapi.New(&config),
+		Marketplace: marketplace.New(&config),
+		Tags:        tags.New(&config),
+		TaxCodes:    taxcodes.New(&config),
+		Webhook:     webhook.New(&config),
 	}
 }
