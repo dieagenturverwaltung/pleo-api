@@ -52,7 +52,7 @@ func (e *SearchAggregatedTagsExec) WithTextSearch(textSearch string) *SearchAggr
 
 func (e *SearchAggregatedTagsExec) Execute() (*shared.CursorPageResponse[AggregatedTagModel], error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[AggregatedTagModel]
@@ -99,7 +99,7 @@ func (e *SearchTagsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *SearchTag
 
 func (e *SearchTagsExec) Execute() (*shared.CursorPageResponse[TagModel], error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryString(queryParams, "text_search", e.textSearch)
 	e.pagingInfo.Apply(queryParams)
 

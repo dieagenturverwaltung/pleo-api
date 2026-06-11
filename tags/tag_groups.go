@@ -43,7 +43,7 @@ func (e *GetAggregatedTagGroupsExec) WithTagGroupIDs(tagGroupIDs ...string) *Get
 func (e *GetAggregatedTagGroupsExec) Execute() (*shared.ListResponse[AggregatedTagGroupModel], error) {
 	queryParams := make(url.Values)
 	if e.companyID != nil || e.organizationID == nil {
-		shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+		shared.AddQueryCompanyID(queryParams, e.companyID)
 	}
 	shared.AddQueryString(queryParams, "organization_id", e.organizationID)
 	shared.AddQueryStrings(queryParams, "tag_group_ids", e.tagGroupIDs)
@@ -87,7 +87,7 @@ func (e *GetTagGroupsExec) WithOrganizationID(organizationID string) *GetTagGrou
 func (e *GetTagGroupsExec) Execute() (*shared.ListResponse[TagGroupModel], error) {
 	queryParams := make(url.Values)
 	if e.companyID != nil || e.organizationID == nil {
-		shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+		shared.AddQueryCompanyID(queryParams, e.companyID)
 	}
 	shared.AddQueryString(queryParams, "organization_id", e.organizationID)
 
@@ -149,7 +149,7 @@ func (e *CreateTagGroupExec) WithName(name string) *CreateTagGroupExec {
 
 func (e *CreateTagGroupExec) Execute() (*TagGroupModel, error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 
 	var out shared.Response[TagGroupModel]
 	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/tag-groups", queryParams), e.body, &out)

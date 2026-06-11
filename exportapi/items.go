@@ -77,7 +77,7 @@ func (e *GetExportJobItemByAccountingEntryIDExec) WithAccountingEntryID(accounti
 
 func (e *GetExportJobItemByAccountingEntryIDExec) Execute() (*ExportJobItem, error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryString(queryParams, "accounting_entry_id", e.accountingEntryID)
 
 	var out shared.Response[ExportJobItem]
@@ -134,7 +134,7 @@ func (e *SearchExportJobItemsExec) WithStatus(status ExportJobItemStatus) *Searc
 
 func (e *SearchExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobItem], error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[ExportJobItem]

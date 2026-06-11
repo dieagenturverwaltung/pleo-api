@@ -68,10 +68,6 @@ func (e *CreateTaxCodeExec) WithType(taxCodeType TaxCodeType) *CreateTaxCodeExec
 }
 
 func (e *CreateTaxCodeExec) Execute() (*TaxCodeModel, error) {
-	if e.body.CompanyID == "" && e.config.CompanyID != nil {
-		e.body.CompanyID = *e.config.CompanyID
-	}
-
 	var out shared.Response[TaxCodeModel]
 	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath, e.body, &out)
 	if err != nil {
@@ -168,10 +164,6 @@ func (e *UpdateTaxCodeExec) WithType(taxCodeType TaxCodeType) *UpdateTaxCodeExec
 }
 
 func (e *UpdateTaxCodeExec) Execute() (*TaxCodeModel, error) {
-	if e.body.CompanyID == "" && e.config.CompanyID != nil {
-		e.body.CompanyID = *e.config.CompanyID
-	}
-
 	var out shared.Response[TaxCodeModel]
 	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.taxCodeID), e.body, &out)
 	if err != nil {
@@ -251,7 +243,7 @@ func (e *GetTaxCodesExec) WithType(taxCodeType TaxCodeType) *GetTaxCodesExec {
 
 func (e *GetTaxCodesExec) Execute() (*shared.CursorPageResponse[TaxCodeModel], error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[TaxCodeModel]

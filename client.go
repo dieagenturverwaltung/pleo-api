@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/dieagenturverwaltung/pleo-api/companies"
 	"github.com/dieagenturverwaltung/pleo-api/exportapi"
 	"github.com/dieagenturverwaltung/pleo-api/marketplace"
 	"github.com/dieagenturverwaltung/pleo-api/tags"
@@ -54,6 +55,7 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 }
 
 type HttpClient struct {
+	Companies   *companies.Client
 	Export      *exportapi.Client
 	Marketplace *marketplace.Client
 	Tags        *tags.Client
@@ -83,9 +85,9 @@ func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpCli
 	config.HttpClient = newClient
 	config.Logger = cfg.Logger
 	config.Debug = cfg.Debug
-	config.CompanyID = cfg.CompanyID
 
 	return &HttpClient{
+		Companies:   companies.New(&config),
 		Export:      exportapi.New(&config),
 		Marketplace: marketplace.New(&config),
 		Tags:        tags.New(&config),

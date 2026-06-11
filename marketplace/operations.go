@@ -54,7 +54,7 @@ func (e *GetClientInstallationExec) WithCompanyID(companyID string) *GetClientIn
 
 func (e *GetClientInstallationExec) Execute() (*InstallationResponse, error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 
 	var out InstallationResponse
 	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/installations/me", queryParams), nil, &out)

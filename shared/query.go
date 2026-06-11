@@ -43,13 +43,8 @@ func AddQueryInt64(values url.Values, name string, value *int64) {
 	}
 }
 
-func AddQueryCompanyID(values url.Values, companyID *string, config *Config) {
+func AddQueryCompanyID(values url.Values, companyID *string) {
 	if companyID != nil {
 		values.Add("company_id", *companyID)
-		return
-	}
-
-	if config.CompanyID != nil {
-		values.Add("company_id", *config.CompanyID)
 	}
 }

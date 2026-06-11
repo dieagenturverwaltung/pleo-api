@@ -42,7 +42,7 @@ func (e *GetExportJobsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *GetExp
 
 func (e *GetExportJobsExec) Execute() (*shared.CursorPageResponse[ExportJob], error) {
 	queryParams := make(url.Values)
-	shared.AddQueryCompanyID(queryParams, e.companyID, e.config)
+	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryStrings(queryParams, "statuses", e.statuses)
 	e.pagingInfo.Apply(queryParams)
 
@@ -101,10 +101,6 @@ func (e *CreateExportJobExec) WithVendorBasedBookkeeping(enabled bool) *CreateEx
 }
 
 func (e *CreateExportJobExec) Execute() (*ExportJob, error) {
-	if e.body.CompanyID == "" && e.config.CompanyID != nil {
-		e.body.CompanyID = *e.config.CompanyID
-	}
-
 	var out shared.Response[ExportJob]
 	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/export-jobs", e.body, &out)
 	if err != nil {

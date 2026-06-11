@@ -20,7 +20,6 @@ type tokenConfigData struct {
 	Token        *oauth2.Token `json:"token"`
 	ClientID     string        `json:"client_id"`
 	ClientSecret string        `json:"client_secret"`
-	CompanyID    string        `json:"company_id"`
 }
 
 func init() {
@@ -56,7 +55,6 @@ func client() (*HttpClient, context.CancelFunc) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	cfg := &HttpConfiguration{
 		Token:         tokenConfig.Token,
-		CompanyID:     &tokenConfig.CompanyID,
 		OnTokenUpdate: onTokenChange,
 		Debug:         true,
 		Logger:        log.Printf,
@@ -72,7 +70,16 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		_, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).Execute()
+		companies, err := client.Companies.Search(ctx).Execute()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if len(companies.Data) == 0 {
+			t.Fatal("no companies found")
+		}
+
+		_, err = client.Tags.TagGroupsApi.GetTagGroups(ctx).WithCompanyID(companies.Data[0].ID).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}

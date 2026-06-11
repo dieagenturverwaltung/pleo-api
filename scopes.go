@@ -1,6 +1,7 @@
 package pleo_api
 
 const (
+	ScopeCompaniesRead   = "companies:read"
 	ScopeExportItemsRead = "export-items:read"
 	ScopeExportJobsRead  = "export-jobs:read"
 	ScopeExportJobsWrite = "export-jobs:write"
@@ -13,6 +14,7 @@ const (
 )
 
 var AllScopes = []string{
+	ScopeCompaniesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
@@ -23,6 +25,7 @@ var AllScopes = []string{
 }
 
 var AllScopesProd = []string{
+	ScopeCompaniesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
