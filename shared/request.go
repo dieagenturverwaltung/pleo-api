@@ -59,6 +59,16 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		if c.Debug {
 			c.Logger("Failed to send request: %s %s: %s", method, url, response.Status)
+			// log body
+			responseData, err := io.ReadAll(response.Body)
+			if err == nil {
+				responseBody := string(responseData)
+				c.Logger("Response body: %s %s: %s", method, url, responseBody)
+
+				// override the old body
+				response.Body.Close()
+				response.Body = io.NopCloser(bytes.NewBuffer(responseData))
+			}
 		}
 
 		return nil, response, errors.New(response.Status)
