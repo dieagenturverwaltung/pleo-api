@@ -65,7 +65,6 @@ type HttpClient struct {
 
 type HttpConfiguration struct {
 	Token         *oauth2.Token
-	CompanyID     *string
 	OnTokenUpdate func(token *oauth2.Token, refreshError error)
 	Logger        func(string, ...any)
 	Debug         bool
