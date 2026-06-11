@@ -53,14 +53,16 @@ type IPayload interface {
 
 // Payload is the payload submitted by pleo to the webhook url
 type Payload[T IPayload] struct {
-	WebhookId        string `json:"webhook-id"`
-	WebhookTimestamp int    `json:"webhook-timestamp"`
-	WebhookSignature string `json:"webhook-signature"`
-	Payload          struct {
-		Data      T      `json:"data"`
-		EventId   string `json:"eventId"`
-		EventType string `json:"eventType"`
-	} `json:"payload"`
+	WebhookId        string         `json:"webhook-id"`
+	WebhookTimestamp int            `json:"webhook-timestamp"`
+	WebhookSignature string         `json:"webhook-signature"`
+	Payload          PayloadInfo[T] `json:"payload"`
+}
+
+type PayloadInfo[T IPayload] struct {
+	Data      T      `json:"data"`
+	EventId   string `json:"eventId"`
+	EventType string `json:"eventType"`
 }
 
 type PayloadExport struct {
