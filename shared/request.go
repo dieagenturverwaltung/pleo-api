@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"golang.org/x/oauth2"
 )
 
 func (c *Config) SendRequest(ctx context.Context, method string, url string, body any, output any) ([]byte, *http.Response, error) {
@@ -50,25 +52,21 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 	if err != nil {
 		if c.Debug {
 			c.Logger("Failed to send request: %v: %s %s", err, method, url)
+			if response != nil {
+				c.logFailedResponseBody(method, url, response)
+			} else {
+				c.logRequestErrorBody(method, url, err)
+			}
 		}
 
-		return nil, nil, err
+		return nil, response, err
 	}
 
 	defer response.Body.Close()
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		if c.Debug {
 			c.Logger("Failed to send request: %s %s: %s", method, url, response.Status)
-			// log body
-			responseData, err := io.ReadAll(response.Body)
-			if err == nil {
-				responseBody := string(responseData)
-				c.Logger("Response body: %s %s: %s", method, url, responseBody)
-
-				// override the old body
-				response.Body.Close()
-				response.Body = io.NopCloser(bytes.NewBuffer(responseData))
-			}
+			c.logFailedResponseBody(method, url, response)
 		}
 
 		return nil, response, errors.New(response.Status)
@@ -99,4 +97,30 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 	}
 
 	return responseData, response, nil
+}
+
+func (c *Config) logFailedResponseBody(method, url string, response *http.Response) {
+	if response.Body == nil {
+		return
+	}
+
+	responseData, err := io.ReadAll(response.Body)
+	if err != nil {
+		c.Logger("Failed to read response body: %v: %s %s", err, method, url)
+		return
+	}
+
+	c.Logger("Response body: %s %s: %s", method, url, string(responseData))
+
+	response.Body.Close()
+	response.Body = io.NopCloser(bytes.NewBuffer(responseData))
+}
+
+func (c *Config) logRequestErrorBody(method, url string, err error) {
+	var retrieveErr *oauth2.RetrieveError
+	if !errors.As(err, &retrieveErr) || len(retrieveErr.Body) == 0 {
+		return
+	}
+
+	c.Logger("Response body: %s %s: %s", method, url, string(retrieveErr.Body))
 }
