@@ -18,8 +18,10 @@ var tokenConfig tokenConfigData
 
 type tokenConfigData struct {
 	Token        *oauth2.Token `json:"token"`
+	CompanyID    string        `json:"company_id"`
 	ClientID     string        `json:"client_id"`
 	ClientSecret string        `json:"client_secret"`
+	Staging      bool          `json:"staging"`
 }
 
 func init() {
@@ -60,7 +62,30 @@ func client() (*HttpClient, context.CancelFunc) {
 		Logger:        log.Printf,
 	}
 
-	return New(tokenConfig.ClientID, tokenConfig.ClientSecret, true, AllScopes...).Http(ctx, cfg), cancel
+	var scopes []string
+	if tokenConfig.Staging {
+		scopes = AllScopes
+	} else {
+		scopes = AllScopesProd
+	}
+
+	return New(tokenConfig.ClientID, tokenConfig.ClientSecret, tokenConfig.Staging, scopes...).Http(ctx, cfg), cancel
+}
+
+func TestActivateInstallation(t *testing.T) {
+	client, cancelClient := client()
+	defer cancelClient()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+
+	t.Run("ActivateInstallation", func(t *testing.T) {
+		execute, err := client.Marketplace.ActivateMyInstallation(ctx).Execute()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Logf("Installation activated: %v", execute)
+	})
 }
 
 func TestTagGroup(t *testing.T) {
@@ -70,16 +95,7 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		companies, err := client.Companies.Search(ctx).Execute()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if len(companies.Data) == 0 {
-			t.Fatal("no companies found")
-		}
-
-		_, err = client.Tags.TagGroupsApi.GetTagGroups(ctx).WithCompanyID(companies.Data[0].ID).Execute()
+		_, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).WithCompanyID(tokenConfig.CompanyID).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}
