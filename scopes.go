@@ -11,10 +11,11 @@ const (
 	ScopeTagGroupWrite   = "tag-group:write"
 	ScopeTaxCodesRead    = "tax-codes:read"
 	ScopeTaxCodesWrite   = "tax-codes:write"
+	ScopeAccountsRead    = "accounts:read"
+	ScopeAccountsWrite   = "accounts:write"
 )
 
 var AllScopes = []string{
-	ScopeCompaniesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
@@ -22,10 +23,11 @@ var AllScopes = []string{
 	ScopeTagGroupsWrite,
 	ScopeTaxCodesRead,
 	ScopeTaxCodesWrite,
+	ScopeAccountsRead,
+	ScopeAccountsWrite,
 }
 
 var AllScopesProd = []string{
-	ScopeCompaniesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
@@ -33,4 +35,6 @@ var AllScopesProd = []string{
 	ScopeTagGroupWrite,
 	ScopeTaxCodesRead,
 	ScopeTaxCodesWrite,
+	ScopeAccountsRead,
+	ScopeAccountsWrite,
 }
