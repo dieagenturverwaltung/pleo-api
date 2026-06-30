@@ -5,12 +5,28 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
 	"golang.org/x/oauth2"
 )
+
+type RequestError struct {
+	StatusCode  int
+	Status      string
+	Body        []byte
+	OriginalErr error
+}
+
+func (e *RequestError) Error() string {
+	return fmt.Sprintf("Request failed with status code %d: %s: %s", e.StatusCode, e.Status, e.OriginalErr)
+}
+
+func (e *RequestError) Unwrap() error {
+	return e.OriginalErr
+}
 
 func (c *Config) SendRequest(ctx context.Context, method string, url string, body any, output any) ([]byte, *http.Response, error) {
 	var bodyReady io.Reader
@@ -53,10 +69,11 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 		if c.Debug {
 			c.Logger("Failed to send request: %v: %s %s", err, method, url)
 			if response != nil {
-				c.logFailedResponseBody(method, url, response)
-			} else {
-				c.logRequestErrorBody(method, url, err)
+				data := c.logFailedResponseBody(method, url, response)
+				return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data, OriginalErr: err}
 			}
+
+			c.logRequestErrorBody(method, url, err)
 		}
 
 		return nil, response, err
@@ -66,10 +83,11 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		if c.Debug {
 			c.Logger("Failed to send request: %s %s: %s", method, url, response.Status)
-			c.logFailedResponseBody(method, url, response)
+			data := c.logFailedResponseBody(method, url, response)
+			return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data}
 		}
 
-		return nil, response, errors.New(response.Status)
+		return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status}
 	}
 
 	if c.Debug {
@@ -99,21 +117,22 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 	return responseData, response, nil
 }
 
-func (c *Config) logFailedResponseBody(method, url string, response *http.Response) {
+func (c *Config) logFailedResponseBody(method, url string, response *http.Response) []byte {
 	if response.Body == nil {
-		return
+		return nil
 	}
 
 	responseData, err := io.ReadAll(response.Body)
 	if err != nil {
 		c.Logger("Failed to read response body: %v: %s %s", err, method, url)
-		return
+		return nil
 	}
 
 	c.Logger("Response body: %s %s: %s", method, url, string(responseData))
 
 	response.Body.Close()
 	response.Body = io.NopCloser(bytes.NewBuffer(responseData))
+	return responseData
 }
 
 func (c *Config) logRequestErrorBody(method, url string, err error) {
