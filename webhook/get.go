@@ -22,12 +22,13 @@ func (e *GetExec) WithContext(ctx context.Context) *GetExec {
 	return e
 }
 
-func (e *GetExec) Execute() (*Info, error) {
+func (e *GetExec) Execute() (*Info, *shared.ResponseExtra, error) {
 	var out shared.Response[Info]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.id), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.id), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

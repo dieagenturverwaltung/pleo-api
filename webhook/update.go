@@ -67,12 +67,13 @@ func (e *UpdateExec) WithBasicAuth(username, password string) *UpdateExec {
 	return e
 }
 
-func (e *UpdateExec) Execute() (*Info, error) {
+func (e *UpdateExec) Execute() (*Info, *shared.ResponseExtra, error) {
 	var out shared.Response[Info]
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.id), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.id), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

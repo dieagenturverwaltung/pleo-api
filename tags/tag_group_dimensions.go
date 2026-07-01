@@ -22,15 +22,16 @@ func (e *GetTagGroupDimensionsExec) WithContext(ctx context.Context) *GetTagGrou
 	return e
 }
 
-func (e *GetTagGroupDimensionsExec) Execute() (*shared.ListResponse[TagGroupDimensionModel], error) {
+func (e *GetTagGroupDimensionsExec) Execute() (*shared.ListResponse[TagGroupDimensionModel], *shared.ResponseExtra, error) {
 	var out shared.ListResponse[TagGroupDimensionModel]
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/dimensions"
-	_, _, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type CreateTagGroupDimensionExec struct {
@@ -74,15 +75,16 @@ func (e *CreateTagGroupDimensionExec) WithVisible(visible bool) *CreateTagGroupD
 	return e
 }
 
-func (e *CreateTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, error) {
+func (e *CreateTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagGroupDimensionModel]
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/dimensions"
-	_, _, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type GetTagGroupDimensionExec struct {
@@ -101,15 +103,16 @@ func (e *GetTagGroupDimensionExec) WithContext(ctx context.Context) *GetTagGroup
 	return e
 }
 
-func (e *GetTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, error) {
+func (e *GetTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagGroupDimensionModel]
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateTagGroupDimensionExec struct {
@@ -154,15 +157,16 @@ func (e *UpdateTagGroupDimensionExec) WithVisible(visible bool) *UpdateTagGroupD
 	return e
 }
 
-func (e *UpdateTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, error) {
+func (e *UpdateTagGroupDimensionExec) Execute() (*TagGroupDimensionModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagGroupDimensionModel]
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteTagGroupDimensionExec struct {
@@ -181,8 +185,8 @@ func (e *DeleteTagGroupDimensionExec) WithContext(ctx context.Context) *DeleteTa
 	return e
 }
 
-func (e *DeleteTagGroupDimensionExec) Execute() error {
+func (e *DeleteTagGroupDimensionExec) Execute() (*shared.ResponseExtra, error) {
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", path, nil, nil)
-	return err
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", path, nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }

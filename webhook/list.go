@@ -47,7 +47,7 @@ func (e *ListExec) WithPagingInfo(pagingInfo shared.PagingInfo) *ListExec {
 	return e
 }
 
-func (e *ListExec) Execute() (*shared.CursorPageResponse[Info], error) {
+func (e *ListExec) Execute() (*shared.CursorPageResponse[Info], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	e.pagingInfo.Apply(queryParams)
 	if e.status != nil {
@@ -59,10 +59,11 @@ func (e *ListExec) Execute() (*shared.CursorPageResponse[Info], error) {
 	}
 
 	var out shared.CursorPageResponse[Info]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath, queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath, queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }

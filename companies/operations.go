@@ -34,18 +34,19 @@ func (e *SearchExec) WithPagingInfo(pagingInfo shared.PagingInfo) *SearchExec {
 	return e
 }
 
-func (e *SearchExec) Execute() (*shared.CursorPageResponse[Company], error) {
+func (e *SearchExec) Execute() (*shared.CursorPageResponse[Company], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryString(queryParams, "organization_id", e.organizationID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[Company]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath, queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath, queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetExec struct {
@@ -63,12 +64,13 @@ func (e *GetExec) WithContext(ctx context.Context) *GetExec {
 	return e
 }
 
-func (e *GetExec) Execute() (*Company, error) {
+func (e *GetExec) Execute() (*Company, *shared.ResponseExtra, error) {
 	var out shared.Response[Company]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.companyID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.companyID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

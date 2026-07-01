@@ -22,14 +22,15 @@ func (e *GetTagDimensionValuesExec) WithContext(ctx context.Context) *GetTagDime
 	return e
 }
 
-func (e *GetTagDimensionValuesExec) Execute() (*shared.ListResponse[TagDimensionValueModel], error) {
+func (e *GetTagDimensionValuesExec) Execute() (*shared.ListResponse[TagDimensionValueModel], *shared.ResponseExtra, error) {
 	var out shared.ListResponse[TagDimensionValueModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tags/"+url.PathEscape(e.tagID)+"/dimensions", nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tags/"+url.PathEscape(e.tagID)+"/dimensions", nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetDimensionValueExec struct {
@@ -48,15 +49,16 @@ func (e *GetDimensionValueExec) WithContext(ctx context.Context) *GetDimensionVa
 	return e
 }
 
-func (e *GetDimensionValueExec) Execute() (*TagDimensionValueModel, error) {
+func (e *GetDimensionValueExec) Execute() (*TagDimensionValueModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagDimensionValueModel]
 	path := basePath + "/tags/" + url.PathEscape(e.tagID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", path, nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type CreateDimensionValueExec struct {
@@ -86,15 +88,16 @@ func (e *CreateDimensionValueExec) WithValue(value string) *CreateDimensionValue
 	return e
 }
 
-func (e *CreateDimensionValueExec) Execute() (*TagDimensionValueModel, error) {
+func (e *CreateDimensionValueExec) Execute() (*TagDimensionValueModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagDimensionValueModel]
 	path := basePath + "/tags/" + url.PathEscape(e.tagID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateDimensionValueExec struct {
@@ -124,15 +127,16 @@ func (e *UpdateDimensionValueExec) WithValue(value string) *UpdateDimensionValue
 	return e
 }
 
-func (e *UpdateDimensionValueExec) Execute() (*TagDimensionValueModel, error) {
+func (e *UpdateDimensionValueExec) Execute() (*TagDimensionValueModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagDimensionValueModel]
 	path := basePath + "/tags/" + url.PathEscape(e.tagID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteDimensionValueExec struct {
@@ -151,13 +155,14 @@ func (e *DeleteDimensionValueExec) WithContext(ctx context.Context) *DeleteDimen
 	return e
 }
 
-func (e *DeleteDimensionValueExec) Execute() (*TagDimensionValueModel, error) {
+func (e *DeleteDimensionValueExec) Execute() (*TagDimensionValueModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagDimensionValueModel]
 	path := basePath + "/tags/" + url.PathEscape(e.tagID) + "/dimensions/" + url.PathEscape(e.dimensionID)
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", path, nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", path, nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

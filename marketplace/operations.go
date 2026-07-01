@@ -21,14 +21,15 @@ func (e *CompleteInstallationExec) WithContext(ctx context.Context) *CompleteIns
 	return e
 }
 
-func (e *CompleteInstallationExec) Execute() (*InstallationResponse, error) {
+func (e *CompleteInstallationExec) Execute() (*InstallationResponse, *shared.ResponseExtra, error) {
 	var out InstallationResponse
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/installations/completions", nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/installations/completions", nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetClientInstallationExec struct {
@@ -52,17 +53,18 @@ func (e *GetClientInstallationExec) WithCompanyID(companyID string) *GetClientIn
 	return e
 }
 
-func (e *GetClientInstallationExec) Execute() (*InstallationResponse, error) {
+func (e *GetClientInstallationExec) Execute() (*InstallationResponse, *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 
 	var out InstallationResponse
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/installations/me", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/installations/me", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type CreateClientInstallationExec struct {
@@ -95,14 +97,15 @@ func (e *CreateClientInstallationExec) WithStatus(status InstallationStatus) *Cr
 	return e
 }
 
-func (e *CreateClientInstallationExec) Execute() (*InstallationResponse, error) {
+func (e *CreateClientInstallationExec) Execute() (*InstallationResponse, *shared.ResponseExtra, error) {
 	var out InstallationResponse
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/installations/me", e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath+"/installations/me", e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type UpdateClientInstallationExec struct {
@@ -140,14 +143,15 @@ func (e *UpdateClientInstallationExec) WithStatus(status InstallationStatus) *Up
 	return e
 }
 
-func (e *UpdateClientInstallationExec) Execute() (*InstallationResponse, error) {
+func (e *UpdateClientInstallationExec) Execute() (*InstallationResponse, *shared.ResponseExtra, error) {
 	var out InstallationResponse
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/installations/me", e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/installations/me", e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type DeleteClientInstallationExec struct {
@@ -164,9 +168,9 @@ func (e *DeleteClientInstallationExec) WithContext(ctx context.Context) *DeleteC
 	return e
 }
 
-func (e *DeleteClientInstallationExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/installations/me", nil, nil)
-	return err
+func (e *DeleteClientInstallationExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/installations/me", nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }
 
 type ActivateMyInstallationExec struct {
@@ -183,14 +187,15 @@ func (e *ActivateMyInstallationExec) WithContext(ctx context.Context) *ActivateM
 	return e
 }
 
-func (e *ActivateMyInstallationExec) Execute() (*InstallationResponse, error) {
+func (e *ActivateMyInstallationExec) Execute() (*InstallationResponse, *shared.ResponseExtra, error) {
 	var out InstallationResponse
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/installations/me:activate", nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath+"/installations/me:activate", nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type IntrospectExec struct {
@@ -207,12 +212,13 @@ func (e *IntrospectExec) WithContext(ctx context.Context) *IntrospectExec {
 	return e
 }
 
-func (e *IntrospectExec) Execute() (*ExternalClientModel, error) {
+func (e *IntrospectExec) Execute() (*ExternalClientModel, *shared.ResponseExtra, error) {
 	var out ExternalClientModelDetails
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/introspect", nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/introspect", nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

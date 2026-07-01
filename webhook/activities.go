@@ -35,17 +35,18 @@ func (e *ActivitiesExec) WithPagingInfo(pagingInfo shared.PagingInfo) *Activitie
 	return e
 }
 
-func (e *ActivitiesExec) Execute() (*shared.CursorPageResponse[Activity], error) {
+func (e *ActivitiesExec) Execute() (*shared.CursorPageResponse[Activity], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryStrings(queryParams, "operation_types", e.operationTypes)
 	e.pagingInfo.Apply(queryParams)
 
 	path := basePath + "/" + url.PathEscape(e.id) + "/activities"
 	var out shared.CursorPageResponse[Activity]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }

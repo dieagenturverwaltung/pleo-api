@@ -17,6 +17,7 @@ type RequestError struct {
 	StatusCode  int
 	Status      string
 	Body        []byte
+	Extra       *ResponseExtra
 	OriginalErr error
 }
 
@@ -70,7 +71,7 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 			c.Logger("Failed to send request: %v: %s %s", err, method, url)
 			if response != nil {
 				data := c.logFailedResponseBody(method, url, response)
-				return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data, OriginalErr: err}
+				return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data, Extra: ResponseExtraFromResponse(response), OriginalErr: err}
 			}
 
 			c.logRequestErrorBody(method, url, err)
@@ -84,10 +85,10 @@ func (c *Config) SendRequest(ctx context.Context, method string, url string, bod
 		if c.Debug {
 			c.Logger("Failed to send request: %s %s: %s", method, url, response.Status)
 			data := c.logFailedResponseBody(method, url, response)
-			return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data}
+			return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Body: data, Extra: ResponseExtraFromResponse(response)}
 		}
 
-		return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status}
+		return nil, response, &RequestError{StatusCode: response.StatusCode, Status: response.Status, Extra: ResponseExtraFromResponse(response)}
 	}
 
 	if c.Debug {

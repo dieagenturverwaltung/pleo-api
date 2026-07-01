@@ -22,12 +22,13 @@ func (e *SecretExec) WithContext(ctx context.Context) *SecretExec {
 	return e
 }
 
-func (e *SecretExec) Execute() (*Secret, error) {
+func (e *SecretExec) Execute() (*Secret, *shared.ResponseExtra, error) {
 	var out shared.Response[Secret]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.id)+"/secret", nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.id)+"/secret", nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

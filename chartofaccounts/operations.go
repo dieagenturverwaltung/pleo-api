@@ -62,14 +62,15 @@ func (e *CreateAccountExec) WithTaxCodeExternalID(taxCodeExternalID string) *Cre
 	return e
 }
 
-func (e *CreateAccountExec) Execute() (*Account, error) {
+func (e *CreateAccountExec) Execute() (*Account, *shared.ResponseExtra, error) {
 	var out shared.Response[Account]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type CreateAccountsBatchExec struct {
@@ -102,14 +103,15 @@ func (e *CreateAccountsBatchExec) WithItems(items ...AccountBatchRequestItem) *C
 	return e
 }
 
-func (e *CreateAccountsBatchExec) Execute() (*AccountBatchCreateResponse, error) {
+func (e *CreateAccountsBatchExec) Execute() (*AccountBatchCreateResponse, *shared.ResponseExtra, error) {
 	var out shared.Response[AccountBatchCreateResponse]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/batch", e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath+"/batch", e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type GetAccountExec struct {
@@ -127,14 +129,15 @@ func (e *GetAccountExec) WithContext(ctx context.Context) *GetAccountExec {
 	return e
 }
 
-func (e *GetAccountExec) Execute() (*Account, error) {
+func (e *GetAccountExec) Execute() (*Account, *shared.ResponseExtra, error) {
 	var out shared.Response[Account]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.accountID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.accountID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateAccountExec struct {
@@ -183,14 +186,15 @@ func (e *UpdateAccountExec) WithTaxCodeExternalID(taxCodeExternalID string) *Upd
 	return e
 }
 
-func (e *UpdateAccountExec) Execute() (*Account, error) {
+func (e *UpdateAccountExec) Execute() (*Account, *shared.ResponseExtra, error) {
 	var out shared.Response[Account]
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.accountID), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.accountID), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteAccountExec struct {
@@ -208,9 +212,9 @@ func (e *DeleteAccountExec) WithContext(ctx context.Context) *DeleteAccountExec 
 	return e
 }
 
-func (e *DeleteAccountExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.accountID), nil, nil)
-	return err
+func (e *DeleteAccountExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.accountID), nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }
 
 type SearchAccountsExec struct {
@@ -285,15 +289,16 @@ func (e *SearchAccountsExec) WithName(name string) *SearchAccountsExec {
 	return e
 }
 
-func (e *SearchAccountsExec) Execute() (*shared.CursorPageResponse[Account], error) {
+func (e *SearchAccountsExec) Execute() (*shared.CursorPageResponse[Account], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[Account]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+":search", queryParams), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+":search", queryParams), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }

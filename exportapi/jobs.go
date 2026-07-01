@@ -40,19 +40,20 @@ func (e *GetExportJobsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *GetExp
 	return e
 }
 
-func (e *GetExportJobsExec) Execute() (*shared.CursorPageResponse[ExportJob], error) {
+func (e *GetExportJobsExec) Execute() (*shared.CursorPageResponse[ExportJob], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryStrings(queryParams, "statuses", e.statuses)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[ExportJob]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-jobs", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-jobs", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type CreateExportJobExec struct {
@@ -100,14 +101,15 @@ func (e *CreateExportJobExec) WithVendorBasedBookkeeping(enabled bool) *CreateEx
 	return e
 }
 
-func (e *CreateExportJobExec) Execute() (*ExportJob, error) {
+func (e *CreateExportJobExec) Execute() (*ExportJob, *shared.ResponseExtra, error) {
 	var out shared.Response[ExportJob]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/export-jobs", e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath+"/export-jobs", e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type GetExportJobExec struct {
@@ -125,14 +127,15 @@ func (e *GetExportJobExec) WithContext(ctx context.Context) *GetExportJobExec {
 	return e
 }
 
-func (e *GetExportJobExec) Execute() (*ExportJob, error) {
+func (e *GetExportJobExec) Execute() (*ExportJob, *shared.ResponseExtra, error) {
 	var out shared.Response[ExportJob]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/export-jobs/"+url.PathEscape(e.jobID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/export-jobs/"+url.PathEscape(e.jobID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type CreateExportJobEventExec struct {
@@ -171,7 +174,7 @@ func (e *CreateExportJobEventExec) WithFailure(reason string, reasonType ExportJ
 	return e
 }
 
-func (e *CreateExportJobEventExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath+"/export-job-events", e.body, nil)
-	return err
+func (e *CreateExportJobEventExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath+"/export-job-events", e.body, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }

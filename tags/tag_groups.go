@@ -40,7 +40,7 @@ func (e *GetAggregatedTagGroupsExec) WithTagGroupIDs(tagGroupIDs ...string) *Get
 	return e
 }
 
-func (e *GetAggregatedTagGroupsExec) Execute() (*shared.ListResponse[AggregatedTagGroupModel], error) {
+func (e *GetAggregatedTagGroupsExec) Execute() (*shared.ListResponse[AggregatedTagGroupModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	if e.companyID != nil || e.organizationID == nil {
 		shared.AddQueryCompanyID(queryParams, e.companyID)
@@ -49,12 +49,13 @@ func (e *GetAggregatedTagGroupsExec) Execute() (*shared.ListResponse[AggregatedT
 	shared.AddQueryStrings(queryParams, "tag_group_ids", e.tagGroupIDs)
 
 	var out shared.ListResponse[AggregatedTagGroupModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/aggregations/tag-groups", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/aggregations/tag-groups", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetTagGroupsExec struct {
@@ -84,7 +85,7 @@ func (e *GetTagGroupsExec) WithOrganizationID(organizationID string) *GetTagGrou
 	return e
 }
 
-func (e *GetTagGroupsExec) Execute() (*shared.ListResponse[TagGroupModel], error) {
+func (e *GetTagGroupsExec) Execute() (*shared.ListResponse[TagGroupModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	if e.companyID != nil || e.organizationID == nil {
 		shared.AddQueryCompanyID(queryParams, e.companyID)
@@ -92,12 +93,13 @@ func (e *GetTagGroupsExec) Execute() (*shared.ListResponse[TagGroupModel], error
 	shared.AddQueryString(queryParams, "organization_id", e.organizationID)
 
 	var out shared.ListResponse[TagGroupModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/tag-groups", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/tag-groups", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type CreateTagGroupExec struct {
@@ -147,17 +149,18 @@ func (e *CreateTagGroupExec) WithName(name string) *CreateTagGroupExec {
 	return e
 }
 
-func (e *CreateTagGroupExec) Execute() (*TagGroupModel, error) {
+func (e *CreateTagGroupExec) Execute() (*TagGroupModel, *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 
 	var out shared.Response[TagGroupModel]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/tag-groups", queryParams), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/tag-groups", queryParams), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type GetTagGroupExec struct {
@@ -175,14 +178,15 @@ func (e *GetTagGroupExec) WithContext(ctx context.Context) *GetTagGroupExec {
 	return e
 }
 
-func (e *GetTagGroupExec) Execute() (*TagGroupModel, error) {
+func (e *GetTagGroupExec) Execute() (*TagGroupModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagGroupModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tag-groups/"+url.PathEscape(e.groupID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tag-groups/"+url.PathEscape(e.groupID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateTagGroupExec struct {
@@ -226,14 +230,15 @@ func (e *UpdateTagGroupExec) WithName(name string) *UpdateTagGroupExec {
 	return e
 }
 
-func (e *UpdateTagGroupExec) Execute() (*TagGroupModel, error) {
+func (e *UpdateTagGroupExec) Execute() (*TagGroupModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagGroupModel]
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/tag-groups/"+url.PathEscape(e.groupID), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/tag-groups/"+url.PathEscape(e.groupID), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteTagGroupExec struct {
@@ -251,12 +256,13 @@ func (e *DeleteTagGroupExec) WithContext(ctx context.Context) *DeleteTagGroupExe
 	return e
 }
 
-func (e *DeleteTagGroupExec) Execute() (*bool, error) {
+func (e *DeleteTagGroupExec) Execute() (*bool, *shared.ResponseExtra, error) {
 	var out bool
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/tag-groups/"+url.PathEscape(e.groupID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/tag-groups/"+url.PathEscape(e.groupID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
