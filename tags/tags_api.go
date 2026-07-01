@@ -50,18 +50,19 @@ func (e *SearchAggregatedTagsExec) WithTextSearch(textSearch string) *SearchAggr
 	return e
 }
 
-func (e *SearchAggregatedTagsExec) Execute() (*shared.CursorPageResponse[AggregatedTagModel], error) {
+func (e *SearchAggregatedTagsExec) Execute() (*shared.CursorPageResponse[AggregatedTagModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[AggregatedTagModel]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/aggregations/tags", queryParams), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/aggregations/tags", queryParams), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type SearchTagsExec struct {
@@ -97,19 +98,20 @@ func (e *SearchTagsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *SearchTag
 	return e
 }
 
-func (e *SearchTagsExec) Execute() (*shared.CursorPageResponse[TagModel], error) {
+func (e *SearchTagsExec) Execute() (*shared.CursorPageResponse[TagModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryString(queryParams, "text_search", e.textSearch)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[TagModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/tags", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/tags", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetTagExec struct {
@@ -127,14 +129,15 @@ func (e *GetTagExec) WithContext(ctx context.Context) *GetTagExec {
 	return e
 }
 
-func (e *GetTagExec) Execute() (*TagModel, error) {
+func (e *GetTagExec) Execute() (*TagModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tags/"+url.PathEscape(e.tagID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/tags/"+url.PathEscape(e.tagID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateTagExec struct {
@@ -173,14 +176,15 @@ func (e *UpdateTagExec) WithName(name string) *UpdateTagExec {
 	return e
 }
 
-func (e *UpdateTagExec) Execute() (*TagModel, error) {
+func (e *UpdateTagExec) Execute() (*TagModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagModel]
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/tags/"+url.PathEscape(e.tagID), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/tags/"+url.PathEscape(e.tagID), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteTagExec struct {
@@ -198,7 +202,7 @@ func (e *DeleteTagExec) WithContext(ctx context.Context) *DeleteTagExec {
 	return e
 }
 
-func (e *DeleteTagExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/tags/"+url.PathEscape(e.tagID), nil, nil)
-	return err
+func (e *DeleteTagExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/tags/"+url.PathEscape(e.tagID), nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }

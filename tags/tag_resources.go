@@ -35,19 +35,20 @@ func (e *GetTagsForGroupExec) WithPagingInfo(pagingInfo shared.PagingInfo) *GetT
 	return e
 }
 
-func (e *GetTagsForGroupExec) Execute() (*shared.CursorPageResponse[TagModel], error) {
+func (e *GetTagsForGroupExec) Execute() (*shared.CursorPageResponse[TagModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryBool(queryParams, "include_archived", e.includeArchived)
 	e.pagingInfo.Apply(queryParams)
 
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/tags"
 	var out shared.CursorPageResponse[TagModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type CreateTagExec struct {
@@ -86,13 +87,14 @@ func (e *CreateTagExec) WithName(name string) *CreateTagExec {
 	return e
 }
 
-func (e *CreateTagExec) Execute() (*TagModel, error) {
+func (e *CreateTagExec) Execute() (*TagModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TagModel]
 	path := basePath + "/tag-groups/" + url.PathEscape(e.groupID) + "/tags"
-	_, _, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }

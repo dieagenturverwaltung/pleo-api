@@ -22,7 +22,7 @@ func (e *DeleteExec) WithContext(ctx context.Context) *DeleteExec {
 	return e
 }
 
-func (e *DeleteExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.id), nil, nil)
-	return err
+func (e *DeleteExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.id), nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }

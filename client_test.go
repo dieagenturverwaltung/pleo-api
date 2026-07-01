@@ -79,12 +79,13 @@ func TestActivateInstallation(t *testing.T) {
 	defer cancel()
 
 	t.Run("ActivateInstallation", func(t *testing.T) {
-		execute, err := client.Marketplace.ActivateMyInstallation(ctx).Execute()
+		execute, extra, err := client.Marketplace.ActivateMyInstallation(ctx).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		t.Logf("Installation activated: %v", execute)
+		t.Logf("Rate limit: %v", extra)
 	})
 }
 
@@ -95,7 +96,7 @@ func TestTagGroup(t *testing.T) {
 	defer cancel()
 
 	t.Run("List", func(t *testing.T) {
-		_, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).WithCompanyID(tokenConfig.CompanyID).Execute()
+		_, _, err := client.Tags.TagGroupsApi.GetTagGroups(ctx).WithCompanyID(tokenConfig.CompanyID).Execute()
 		if err != nil {
 			t.Fatal(err)
 		}

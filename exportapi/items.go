@@ -34,18 +34,19 @@ func (e *GetExportItemsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *GetEx
 	return e
 }
 
-func (e *GetExportItemsExec) Execute() (*shared.CursorPageResponse[ExportItem], error) {
+func (e *GetExportItemsExec) Execute() (*shared.CursorPageResponse[ExportItem], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryString(queryParams, "job_id", e.jobID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[ExportItem]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-items", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-items", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetExportJobItemByAccountingEntryIDExec struct {
@@ -75,18 +76,19 @@ func (e *GetExportJobItemByAccountingEntryIDExec) WithAccountingEntryID(accounti
 	return e
 }
 
-func (e *GetExportJobItemByAccountingEntryIDExec) Execute() (*ExportJobItem, error) {
+func (e *GetExportJobItemByAccountingEntryIDExec) Execute() (*ExportJobItem, *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	shared.AddQueryString(queryParams, "accounting_entry_id", e.accountingEntryID)
 
 	var out shared.Response[ExportJobItem]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-job-items", queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(basePath+"/export-job-items", queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type SearchExportJobItemsExec struct {
@@ -132,18 +134,19 @@ func (e *SearchExportJobItemsExec) WithStatus(status ExportJobItemStatus) *Searc
 	return e
 }
 
-func (e *SearchExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobItem], error) {
+func (e *SearchExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobItem], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[ExportJobItem]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/export-job-items:search", queryParams), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+"/export-job-items:search", queryParams), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type GetExportJobItemsExec struct {
@@ -174,7 +177,7 @@ func (e *GetExportJobItemsExec) WithPagingInfo(pagingInfo shared.PagingInfo) *Ge
 	return e
 }
 
-func (e *GetExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobItem], error) {
+func (e *GetExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobItem], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	if e.status != nil {
 		queryParams.Add("status", string(*e.status))
@@ -183,12 +186,13 @@ func (e *GetExportJobItemsExec) Execute() (*shared.CursorPageResponse[ExportJobI
 
 	path := basePath + "/export-jobs/" + url.PathEscape(e.jobID) + "/items"
 	var out shared.CursorPageResponse[ExportJobItem]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", shared.URLWithQuery(path, queryParams), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
 
 type UpdateExportJobItemsExec struct {
@@ -217,13 +221,14 @@ func (e *UpdateExportJobItemsExec) WithItems(items ...UpdateExportJobItem) *Upda
 	return e
 }
 
-func (e *UpdateExportJobItemsExec) Execute() (*ExportJobItemUpdate, error) {
+func (e *UpdateExportJobItemsExec) Execute() (*ExportJobItemUpdate, *shared.ResponseExtra, error) {
 	path := basePath + "/export-jobs/" + url.PathEscape(e.jobID) + "/items"
 	var out ExportJobItemUpdate
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", path, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }

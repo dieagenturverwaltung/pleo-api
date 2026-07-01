@@ -90,12 +90,13 @@ func (ce *CreateExec) WithBasicAuth(username, password string) *CreateExec {
 	return ce
 }
 
-func (ce *CreateExec) Execute() (*Info, error) {
+func (ce *CreateExec) Execute() (*Info, *shared.ResponseExtra, error) {
 	var response shared.Response[Info]
-	_, _, err := ce.config.SendRequest(ce.ctx, "POST", basePath, ce.body, &response)
+	_, httpResponse, err := ce.config.SendRequest(ce.ctx, "POST", basePath, ce.body, &response)
+	extra := shared.ResponseExtraFromResponse(httpResponse)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &response.Data, nil
+	return &response.Data, extra, nil
 }

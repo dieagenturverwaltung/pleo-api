@@ -67,14 +67,15 @@ func (e *CreateTaxCodeExec) WithType(taxCodeType TaxCodeType) *CreateTaxCodeExec
 	return e
 }
 
-func (e *CreateTaxCodeExec) Execute() (*TaxCodeModel, error) {
+func (e *CreateTaxCodeExec) Execute() (*TaxCodeModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TaxCodeModel]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", basePath, e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", basePath, e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type GetTaxCodeExec struct {
@@ -92,14 +93,15 @@ func (e *GetTaxCodeExec) WithContext(ctx context.Context) *GetTaxCodeExec {
 	return e
 }
 
-func (e *GetTaxCodeExec) Execute() (*TaxCodeModel, error) {
+func (e *GetTaxCodeExec) Execute() (*TaxCodeModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TaxCodeModel]
-	_, _, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.taxCodeID), nil, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "GET", basePath+"/"+url.PathEscape(e.taxCodeID), nil, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type UpdateTaxCodeExec struct {
@@ -163,14 +165,15 @@ func (e *UpdateTaxCodeExec) WithType(taxCodeType TaxCodeType) *UpdateTaxCodeExec
 	return e
 }
 
-func (e *UpdateTaxCodeExec) Execute() (*TaxCodeModel, error) {
+func (e *UpdateTaxCodeExec) Execute() (*TaxCodeModel, *shared.ResponseExtra, error) {
 	var out shared.Response[TaxCodeModel]
-	_, _, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.taxCodeID), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "PUT", basePath+"/"+url.PathEscape(e.taxCodeID), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out.Data, nil
+	return &out.Data, extra, nil
 }
 
 type DeleteTaxCodeExec struct {
@@ -188,9 +191,9 @@ func (e *DeleteTaxCodeExec) WithContext(ctx context.Context) *DeleteTaxCodeExec 
 	return e
 }
 
-func (e *DeleteTaxCodeExec) Execute() error {
-	_, _, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.taxCodeID), nil, nil)
-	return err
+func (e *DeleteTaxCodeExec) Execute() (*shared.ResponseExtra, error) {
+	_, response, err := e.config.SendRequest(e.ctx, "DELETE", basePath+"/"+url.PathEscape(e.taxCodeID), nil, nil)
+	return shared.ResponseExtraFromResponse(response), err
 }
 
 type GetTaxCodesExec struct {
@@ -241,16 +244,17 @@ func (e *GetTaxCodesExec) WithType(taxCodeType TaxCodeType) *GetTaxCodesExec {
 	return e
 }
 
-func (e *GetTaxCodesExec) Execute() (*shared.CursorPageResponse[TaxCodeModel], error) {
+func (e *GetTaxCodesExec) Execute() (*shared.CursorPageResponse[TaxCodeModel], *shared.ResponseExtra, error) {
 	queryParams := make(url.Values)
 	shared.AddQueryCompanyID(queryParams, e.companyID)
 	e.pagingInfo.Apply(queryParams)
 
 	var out shared.CursorPageResponse[TaxCodeModel]
-	_, _, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+":search", queryParams), e.body, &out)
+	_, response, err := e.config.SendRequest(e.ctx, "POST", shared.URLWithQuery(basePath+":search", queryParams), e.body, &out)
+	extra := shared.ResponseExtraFromResponse(response)
 	if err != nil {
-		return nil, err
+		return nil, extra, err
 	}
 
-	return &out, nil
+	return &out, extra, nil
 }
