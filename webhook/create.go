@@ -74,7 +74,7 @@ func (ce *CreateExec) WithTokenAuth(token string) *CreateExec {
 		Credentials: &EndpointAuthCredentials{
 			Token: token,
 		},
-		Type: "NONE",
+		Type: "BEARER",
 	}
 	return ce
 }
