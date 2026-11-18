@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/dieagenturverwaltung/pleo-api/accountingentries"
 	"github.com/dieagenturverwaltung/pleo-api/chartofaccounts"
 	"github.com/dieagenturverwaltung/pleo-api/companies"
 	"github.com/dieagenturverwaltung/pleo-api/exportapi"
@@ -56,13 +57,14 @@ func (w *tokenSourceWrapper) Token() (*oauth2.Token, error) {
 }
 
 type HttpClient struct {
-	ChartOfAccounts *chartofaccounts.Client
-	Companies       *companies.Client
-	Export          *exportapi.Client
-	Marketplace     *marketplace.Client
-	Tags            *tags.Client
-	TaxCodes        *taxcodes.Client
-	Webhook         *webhook.Client
+	AccountingEntries *accountingentries.Client
+	ChartOfAccounts   *chartofaccounts.Client
+	Companies         *companies.Client
+	Export            *exportapi.Client
+	Marketplace       *marketplace.Client
+	Tags              *tags.Client
+	TaxCodes          *taxcodes.Client
+	Webhook           *webhook.Client
 }
 
 type HttpConfiguration struct {
@@ -88,12 +90,13 @@ func (client *Client) Http(ctx context.Context, cfg *HttpConfiguration) *HttpCli
 	config.Debug = cfg.Debug
 
 	return &HttpClient{
-		ChartOfAccounts: chartofaccounts.New(&config),
-		Companies:       companies.New(&config),
-		Export:          exportapi.New(&config),
-		Marketplace:     marketplace.New(&config),
-		Tags:            tags.New(&config),
-		TaxCodes:        taxcodes.New(&config),
-		Webhook:         webhook.New(&config),
+		AccountingEntries: accountingentries.New(&config),
+		ChartOfAccounts:   chartofaccounts.New(&config),
+		Companies:         companies.New(&config),
+		Export:            exportapi.New(&config),
+		Marketplace:       marketplace.New(&config),
+		Tags:              tags.New(&config),
+		TaxCodes:          taxcodes.New(&config),
+		Webhook:           webhook.New(&config),
 	}
 }
