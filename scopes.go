@@ -1,21 +1,23 @@
 package pleo_api
 
 const (
-	ScopeCompaniesRead   = "companies:read"
-	ScopeExportItemsRead = "export-items:read"
-	ScopeExportJobsRead  = "export-jobs:read"
-	ScopeExportJobsWrite = "export-jobs:write"
-	ScopeTagGroupsRead   = "tag-groups:read"
-	ScopeTagGroupsWrite  = "tag-groups:write"
-	ScopeTagGroupRead    = "tag-group:read"
-	ScopeTagGroupWrite   = "tag-group:write"
-	ScopeTaxCodesRead    = "tax-codes:read"
-	ScopeTaxCodesWrite   = "tax-codes:write"
-	ScopeAccountsRead    = "accounts:read"
-	ScopeAccountsWrite   = "accounts:write"
+	ScopeAccountingEntriesRead = "accounting-entries:read"
+	ScopeCompaniesRead         = "companies:read"
+	ScopeExportItemsRead       = "export-items:read"
+	ScopeExportJobsRead        = "export-jobs:read"
+	ScopeExportJobsWrite       = "export-jobs:write"
+	ScopeTagGroupsRead         = "tag-groups:read"
+	ScopeTagGroupsWrite        = "tag-groups:write"
+	ScopeTagGroupRead          = "tag-group:read"
+	ScopeTagGroupWrite         = "tag-group:write"
+	ScopeTaxCodesRead          = "tax-codes:read"
+	ScopeTaxCodesWrite         = "tax-codes:write"
+	ScopeAccountsRead          = "accounts:read"
+	ScopeAccountsWrite         = "accounts:write"
 )
 
 var AllScopes = []string{
+	ScopeAccountingEntriesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
@@ -28,6 +30,7 @@ var AllScopes = []string{
 }
 
 var AllScopesProd = []string{
+	ScopeAccountingEntriesRead,
 	ScopeExportItemsRead,
 	ScopeExportJobsRead,
 	ScopeExportJobsWrite,
